@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -131,13 +130,6 @@
       color: black;
       font-weight: bold;
     }
-    /* Remove specific first/last child border radius to allow wrapping */
-    /* .tab:first-child {
-      border-radius: 5px 0 0 5px;
-    }
-    .tab:last-child {
-      border-radius: 0 5px 5px 0;
-    } */
     #loading-screen {
       position: absolute;
       width: 100%;
@@ -179,8 +171,8 @@
       font-size: 0.9em;
       display: none;
     }
-    #welcome-modal, #info-modal, #help-modal { /* Apply common modal styles */
-      position: absolute;
+    #welcome-modal, #info-modal, #help-modal {
+      position: fixed;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
@@ -191,13 +183,27 @@
       padding: 20px;
       z-index: 200;
       box-shadow: 0 0 20px rgba(79, 209, 197, 0.5);
-      display: none; /* Hidden by default */
+      display: none;
       color: white;
     }
     .modal-content {
       max-height: 70vh;
       overflow-y: auto;
       padding-right: 10px;
+      scrollbar-width: thin;
+      scrollbar-color: #4fd1c5 rgba(0, 0, 0, 0.5);
+    }
+    .modal-content::-webkit-scrollbar {
+      width: 8px;
+    }
+    .modal-content::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: 10px;
+    }
+    .modal-content::-webkit-scrollbar-thumb {
+      background-color: #4fd1c5;
+      border-radius: 10px;
+      border: 2px solid rgba(0, 0, 0, 0.5);
     }
     #story-progress {
       position: absolute;
@@ -217,8 +223,14 @@
     .progress-check {
       margin-right: 8px;
       color: #4fd1c5;
+      display: inline-block;
+      width: 20px;
+      text-align: center;
     }
-    .completed {
+    .progress-item span:last-child {
+      transition: opacity 0.3s, text-decoration 0.3s;
+    }
+    .completed span:last-child {
       text-decoration: line-through;
       opacity: 0.7;
     }
@@ -251,7 +263,7 @@
       margin-right: 5px;
       border-radius: 3px;
     }
-    .modal-close-btn { /* Style for close buttons in modals */
+    .modal-close-btn {
         background-color: #4c51bf;
         color: white;
         border: none;
@@ -259,12 +271,33 @@
         border-radius: 5px;
         cursor: pointer;
         display: block;
-        margin: 20px auto 0; /* Center the button */
+        margin: 20px auto 0;
+        font-weight: bold;
+        transition: background-color 0.2s;
     }
     .modal-close-btn:hover {
         background-color: #3b40ab;
     }
-
+    .completion-message {
+        color: #48bb78;
+        font-weight: bold;
+        margin-top: 10px;
+    }
+    #ui-container::-webkit-scrollbar {
+        width: 6px;
+    }
+    #ui-container::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 10px;
+    }
+    #ui-container::-webkit-scrollbar-thumb {
+        background-color: #38b2ac;
+        border-radius: 10px;
+    }
+    #ui-container {
+        scrollbar-width: thin;
+        scrollbar-color: #38b2ac rgba(0, 0, 0, 0.3);
+    }
   </style>
 </head>
 <body>
@@ -284,117 +317,101 @@
       <h1>Welcome to Trig Trek!</h1>
       <p>You are part of an elite team of scientists and explorers sent to map a newly discovered polar island.</p>
       <p>This island, named "Trigonomia," has appeared suddenly following a seismic event in the Arctic. Your mission is to map this mysterious landmass using your mathematical skills.</p>
-
       <h2>Your Mission Objectives:</h2>
       <p>1. <strong>Survey the Land</strong> - Use trigonometric principles to measure triangular regions</p>
       <p>2. <strong>Map Vector Fields</strong> - Record wind patterns and currents using vector mathematics</p>
       <p>3. <strong>Document Polar Features</strong> - Map unusual formations using polar coordinates</p>
       <p>4. <strong>Track Movement Patterns</strong> - Use parametric equations to track migration paths</p>
-
       <p>This simulation will help you apply Chapter 8 concepts in a practical, engaging way.</p>
-
       <p>Ready to begin your adventure?</p>
       <div style="text-align: center; margin-top: 20px;">
-        <button id="start-mission-btn">START MISSION</button>
+        <button id="start-mission-btn" class="modal-close-btn" style="background-color: #4fd1c5; color: black;">START MISSION</button>
       </div>
     </div>
   </div>
 
-  <!-- Info Modal -->
   <div id="info-modal">
     <div class="modal-content">
       <h1 style="color: #4fd1c5;">Concept Information</h1>
       <p>This simulation covers key concepts from trigonometry and vector mathematics:</p>
       <ul>
-        <li><strong>Triangulation:</strong> Uses the Law of Sines (sin(A)/a = sin(B)/b = sin(C)/c) and the Law of Cosines (c² = a² + b² - 2ab·cos(C)) to find unknown sides and angles of triangles. Essential for surveying and distance measurement.</li>
-        <li><strong>Vectors:</strong> Represents quantities with magnitude and direction (like wind or forces). Explores vector components (x, y, z), magnitude (length), and the dot product (used to find the angle between vectors or check for perpendicularity).</li>
-        <li><strong>Polar Coordinates:</strong> Describes points using distance from the origin (r) and an angle (θ). Used here to map features like rose curves (r = a·cos(nθ)) or cardioids (r = a(1+cosθ)) often found in nature.</li>
-        <li><strong>Parametric Equations:</strong> Defines coordinates (x, y) in terms of a third variable, often time (t). Used to trace paths of moving objects, like circular motion (x=a·cos(t), y=a·sin(t)) or more complex curves like cycloids.</li>
+        <li><strong>Triangulation:</strong> Uses the Law of Sines and the Law of Cosines to find unknown sides and angles of triangles. Essential for surveying and distance measurement.</li>
+        <li><strong>Vectors:</strong> Represents quantities with magnitude and direction (like wind or forces). Explores vector components, magnitude, and the dot product.</li>
+        <li><strong>Polar Coordinates:</strong> Describes points using distance from the origin and an angle. Used to map features like rose curves or cardioids.</li>
+        <li><strong>Parametric Equations:</strong> Defines coordinates in terms of a parameter (often time). Used to trace moving paths, like circular or more complex curves.</li>
       </ul>
       <p>Experiment with the different modules to see these concepts in action!</p>
       <button class="modal-close-btn" id="close-info-modal">Close</button>
     </div>
   </div>
 
-  <!-- Help Modal -->
   <div id="help-modal">
     <div class="modal-content">
       <h1 style="color: #4c51bf;">Animation Help</h1>
       <p>Here's how to interact with the animations:</p>
       <ul>
-        <li><strong>General View:</strong> Use your mouse/touchpad to rotate the view (click/touch and drag), zoom (scroll wheel/pinch), and pan (right-click/two-finger drag or Shift+click/drag).</li>
-        <li><strong>Center Map Tab:</strong> Click this tab to reset the camera to the default overview position, looking at the center of the island.</li>
-        <li><strong>Zoom In Tab:</strong> Click this tab for a closer view of the current active module's 3D elements (e.g., the triangle, vectors, or curves).</li>
-        <li><strong>Triangles:</strong> Select a region and problem type. Input known values. Click 'Calculate' to see results and update the 3D triangle shape.</li>
-        <li><strong>Vectors:</strong> Input vector components (x, y, z). Click 'Update Vectors' to see them visually. Click 'Calculate Dot Product' for analysis and angle display.</li>
-        <li><strong>Polar:</strong> Select a feature type. Use sliders for 'a' (size) and 'n' (shape). The curve updates automatically. Click 'Convert' for the approximate rectangular equation.</li>
-        <li><strong>Parametric:</strong> Select path type. Use sliders for parameters 'a' and 'b'. The path updates automatically. Use the 'Speed' slider to control how fast the object moves along the path. Click 'Pause/Resume Animation' to control the object's movement.</li>
-        <li><strong>Hints:</strong> Use the 'Show Hint' button in each module for specific formula reminders.</li>
+        <li><strong>General View:</strong> Rotate, zoom, and pan using your mouse/touchpad.</li>
+        <li><strong>Center Map Tab:</strong> Reset the camera to the default overview.</li>
+        <li><strong>Zoom In Tab:</strong> Get a closer view of the active module's 3D elements.</li>
+        <li><strong>Triangles:</strong> Select a region, input known values, and click 'Calculate Missing Values' to update the 3D triangle.</li>
+        <li><strong>Vectors:</strong> Input vector components, then click 'Update Vectors' and 'Calculate Dot Product' for analysis.</li>
+        <li><strong>Polar:</strong> Select a feature type and adjust sliders. Click 'Convert to Rectangular (Approx.)' for conversion.</li>
+        <li><strong>Parametric:</strong> Select a path type and adjust parameters. Use 'Pause/Resume Animation' to control movement.</li>
+        <li><strong>Hints:</strong> Use the 'Show Hint' button in each module for formula reminders.</li>
       </ul>
       <button class="modal-close-btn" id="close-help-modal">Close</button>
     </div>
   </div>
 
-
   <div id="ui-container">
     <div class="header-buttons">
       <button id="return-overview">Overview</button>
-      <button class="help-btn" id="show-help-header">Help</button> <!-- Changed ID to avoid conflict -->
+      <button class="help-btn" id="show-help-header">Help</button>
     </div>
     <h1>MISSION: TRIG TREK</h1>
-
     <div class="tab-container">
-      <!-- Existing Tabs -->
       <div class="tab active" data-module="overview">Overview</div>
       <div class="tab" data-module="triangulation">Triangles</div>
       <div class="tab" data-module="vectors">Vectors</div>
       <div class="tab" data-module="polar">Polar</div>
       <div class="tab" data-module="parametric">Parametric</div>
-      <!-- New Tabs -->
       <div class="tab" data-module="center-map">Center Map</div>
       <div class="tab" data-module="zoom-in">Zoom In</div>
       <div class="tab" data-module="info">Info</div>
       <div class="tab" data-module="help">Help</div>
     </div>
 
-    <!-- Existing Module Content Divs -->
     <div id="overview" class="module-container active">
       <h2>Mission Control</h2>
       <p>Welcome to Trigonomia Island! Use your math skills to explore and map this mysterious location.</p>
-
       <h2>Modules</h2>
       <p>Select a module tab above or use the buttons below:</p>
       <button class="module-btn" data-module="triangulation">Land Survey (Triangulation)</button>
       <button class="module-btn" data-module="vectors">Vector Terrain Mapping</button>
       <button class="module-btn" data-module="polar">Polar Ecology Mapping</button>
       <button class="module-btn" data-module="parametric">Time-Driven Paths</button>
-
       <h2>Progress</h2>
       <div id="progress-display">
         <p>Tasks completed: 0/4</p>
-        <!-- Progress bar will be added here by JS -->
       </div>
     </div>
 
     <div id="triangulation" class="module-container">
       <h2>Land Survey (Triangulation)</h2>
       <p>Use the Law of Sines and Cosines to calculate missing sides and angles of triangular regions.</p>
-
       <div class="input-group">
-        <label>Select Triangle Region:</label>
+        <label for="triangle-select">Select Triangle Region:</label>
         <select id="triangle-select">
           <option value="1">Region Alpha</option>
           <option value="2">Region Beta</option>
           <option value="3">Region Gamma</option>
         </select>
       </div>
-
       <div id="triangle-info" class="result">
         <p>Select a triangle region to view measurements.</p>
       </div>
-
       <div class="input-group">
-        <label>Triangle Type:</label>
+        <label for="triangle-problem-type">Triangle Type:</label>
         <select id="triangle-problem-type">
           <option value="SSS">SSS - Three Sides</option>
           <option value="SAS">SAS - Two Sides and Included Angle</option>
@@ -402,26 +419,21 @@
           <option value="AAS">AAS - Two Angles and Non-included Side</option>
         </select>
       </div>
-
       <div id="triangle-inputs"></div>
-
       <button id="solve-triangle">Calculate Missing Values</button>
       <button id="triangle-hint-btn">Show Hint</button>
       <div id="triangle-hint" class="hint">
-        Remember: Law of Sines is best for cases with angles and opposite sides, while Law of Cosines works well when you have three sides or two sides and their included angle. Area = 0.5 * a * b * sin(C).
+        Remember: Law of Sines works well with angles and opposite sides; Law of Cosines is best with three sides or two sides and their included angle. Area = 0.5 * a * b * sin(C).
       </div>
-
       <div id="triangle-result" class="result">
         <p>Results will appear here.</p>
       </div>
-
       <button id="complete-triangulation" style="background-color: #48bb78;">Mark Task Complete</button>
     </div>
 
     <div id="vectors" class="module-container">
       <h2>Vector Terrain Mapping</h2>
       <p>Map wind patterns and forces using vectors and calculate dot products.</p>
-
       <div class="input-group">
         <label>Vector 1 (Direction, km):</label>
         <div style="display: flex; gap: 5px;">
@@ -430,7 +442,6 @@
           <input type="number" id="vector1-z" placeholder="z" value="0" step="0.5">
         </div>
       </div>
-
       <div class="input-group">
         <label>Vector 2 (Direction, km):</label>
         <div style="display: flex; gap: 5px;">
@@ -439,27 +450,23 @@
           <input type="number" id="vector2-z" placeholder="z" value="0" step="0.5">
         </div>
       </div>
-
       <button id="calculate-vector">Update Vectors</button>
       <button id="calculate-dot-product">Calculate Dot Product</button>
       <button id="vector-hint-btn">Show Hint</button>
       <div id="vector-hint" class="hint">
-        The dot product (v1 · v2 = x1*x2 + y1*y2 + z1*z2) can tell you if vectors are perpendicular (result = 0) or indicate the angle between them (cos(θ) = (v1·v2) / (|v1|*|v2|)). Positive dot product means acute angle; negative means obtuse.
+        The dot product (v1 · v2 = x1*x2 + y1*y2 + z1*z2) reveals if vectors are perpendicular (result = 0) or the angle between them.
       </div>
-
       <div id="vector-result" class="result">
         <p>Vector analysis will appear here.</p>
       </div>
-
       <button id="complete-vectors" style="background-color: #48bb78;">Mark Task Complete</button>
     </div>
 
     <div id="polar" class="module-container">
       <h2>Polar Ecology Mapping</h2>
       <p>Map unique natural features using polar equations.</p>
-
       <div class="input-group">
-        <label>Feature Type:</label>
+        <label for="polar-type">Feature Type:</label>
         <select id="polar-type">
           <option value="rose">Rose Curve (Flower Fields)</option>
           <option value="limaçon">Limaçon (Coastal Formations)</option>
@@ -468,45 +475,34 @@
           <option value="spiral">Spiral (Mountain Path)</option>
         </select>
       </div>
-
       <div class="input-group">
-        <label>Size Parameter (a):</label>
-        <input type="range" id="polar-a" min="0.1" max="5" step="0.1" value="2"> <!-- Increased max size -->
-        <span id="polar-a-value">2.0</span>
+        <label for="polar-a">Size Parameter (a): <span id="polar-a-value">2.0</span></label>
+        <input type="range" id="polar-a" min="0.1" max="5" step="0.1" value="2">
       </div>
-
       <div class="input-group">
-        <label>Shape Parameter (n):</label>
+        <label for="polar-n">Shape Parameter (n): <span id="polar-n-value">3</span></label>
         <input type="range" id="polar-n" min="1" max="8" step="1" value="3">
-        <span id="polar-n-value">3</span>
       </div>
-
       <div class="input-group">
         <label>Polar Equation:</label>
         <div id="polar-equation" class="result">r = a·cos(nθ)</div>
       </div>
-
-      <!-- Removed Update button as it updates live now -->
-      <!-- <button id="update-polar">Update Feature</button> -->
       <button id="convert-polar">Convert to Rectangular (Approx.)</button>
       <button id="polar-hint-btn">Show Hint</button>
       <div id="polar-hint" class="hint">
-        For rose curves (r=a·cos(nθ) or r=a·sin(nθ)), n determines the number of petals: n petals if n is odd, 2n petals if n is even. 'a' controls the size. Conversion: x = r·cos(θ), y = r·sin(θ), r² = x² + y².
+        For rose curves, n determines the number of petals (odd n: n petals; even n: 2n petals). Conversion: x = r·cos(θ), y = r·sin(θ).
       </div>
-
       <div id="polar-result" class="result">
         <p>Select a feature type to begin mapping.</p>
       </div>
-
       <button id="complete-polar" style="background-color: #48bb78;">Mark Task Complete</button>
     </div>
 
     <div id="parametric" class="module-container">
       <h2>Time-Driven Paths</h2>
-      <p>Track migration patterns and movement using parametric equations.</p>
-
+      <p>Track migration patterns using parametric equations.</p>
       <div class="input-group">
-        <label>Path Type:</label>
+        <label for="parametric-type">Path Type:</label>
         <select id="parametric-type">
           <option value="circle">Circular Path (Bird Migration)</option>
           <option value="cycloid">Cycloid (Rolling Object)</option>
@@ -514,54 +510,40 @@
           <option value="butterfly">Butterfly Curve (Rare Species Path)</option>
         </select>
       </div>
-
       <div class="input-group">
-        <label>Animation Speed:</label>
+        <label for="param-speed">Animation Speed: <span id="param-speed-value">0.5</span></label>
         <input type="range" id="param-speed" min="0.1" max="2" step="0.1" value="0.5">
-        <span id="param-speed-value">0.5</span>
       </div>
-
       <div class="input-group">
-        <label>X Parameter (a):</label>
-        <input type="range" id="param-a" min="0.5" max="5" step="0.1" value="2"> <!-- Finer step -->
-        <span id="param-a-value">2.0</span>
+        <label for="param-a">X Parameter (a): <span id="param-a-value">2.0</span></label>
+        <input type="range" id="param-a" min="0.5" max="5" step="0.1" value="2">
       </div>
-
       <div class="input-group">
-        <label>Y Parameter (b):</label>
-        <input type="range" id="param-b" min="0.5" max="5" step="0.1" value="2"> <!-- Finer step -->
-        <span id="param-b-value">2.0</span>
+        <label for="param-b">Y Parameter (b): <span id="param-b-value">2.0</span></label>
+        <input type="range" id="param-b" min="0.5" max="5" step="0.1" value="2">
       </div>
-
       <div class="input-group">
-        <label>Parametric Equations (x(t), z(t)):</label> <!-- Clarify z-axis mapping -->
+        <label>Parametric Equations (x(t), z(t)):</label>
         <div id="parametric-equation" class="result">
           x = a·cos(t)<br>
-          z = a·sin(t) <!-- Changed y to z -->
+          z = a·sin(t)
         </div>
       </div>
-
-      <!-- Removed Update button as it updates live now -->
-      <!-- <button id="update-parametric">Update Path</button> -->
       <button id="toggle-animation">Pause Animation</button>
       <button id="parametric-hint-btn">Show Hint</button>
       <div id="parametric-hint" class="hint">
-        The parameter t often represents time. As t increases, the object traces the path defined by x(t) and z(t) (visualized on the ground plane). Adjust 'a' and 'b' to change the shape/size.
+        The parameter t represents time. Adjust 'a' and 'b' to modify the path's shape and size.
       </div>
-
       <div id="parametric-result" class="result">
         <p>Select a path type to begin tracking.</p>
       </div>
-
       <button id="complete-parametric" style="background-color: #48bb78;">Mark Task Complete</button>
     </div>
 
-    <!-- Dummy content divs for new tabs (optional, needed if they show specific content) -->
-     <div id="center-map" class="module-container"><h2>Map Centered</h2><p>Camera reset to default view.</p></div>
-     <div id="zoom-in" class="module-container"><h2>Zoomed In</h2><p>Camera moved closer to the active element.</p></div>
-     <div id="info" class="module-container"><h2>Info</h2><p>Displaying conceptual information...</p></div>
-     <div id="help" class="module-container"><h2>Help</h2><p>Displaying interaction help...</p></div>
-
+    <div id="center-map" class="module-container"><h2>Map Centered</h2><p>Camera reset to default view.</p></div>
+    <div id="zoom-in" class="module-container"><h2>Zoomed In</h2><p>Camera moved closer to the active element.</p></div>
+    <div id="info" class="module-container"><h2>Info</h2><p>Displaying conceptual information...</p></div>
+    <div id="help" class="module-container"><h2>Help</h2><p>Displaying interaction help...</p></div>
   </div>
 
   <div id="story-progress">
@@ -602,32 +584,23 @@
       paramTime: 0
     };
 
-    // Three.js variables
-    let scene, camera, renderer, controls; // Added OrbitControls
+    let scene, camera, renderer, controls;
     let clock = new THREE.Clock();
 
-    // Object references
     let island, triangleGroup, vectorGroup, polarGroup, parametricGroup;
     let triangleRegions = [];
-    let vectorArrows = {
-      vector1: null,
-      vector2: null,
-      resultVector: null
-    };
+    let vectorArrows = { vector1: null, vector2: null, resultVector: null };
     let polarCurve = null;
     let parametricPath = null;
     let parametricObject = null;
 
-    // UI Elements
     const modules = ['overview', 'triangulation', 'vectors', 'polar', 'parametric', 'center-map', 'zoom-in', 'info', 'help'];
-    const contentModules = ['overview', 'triangulation', 'vectors', 'polar', 'parametric']; // Modules with actual content panels
+    const contentModules = ['overview', 'triangulation', 'vectors', 'polar', 'parametric'];
 
-    // Loading screen
     const loadingScreen = document.getElementById('loading-screen');
     const progressBar = document.getElementById('progress-bar');
     const loadingText = document.getElementById('loading-text');
 
-    // Modals
     const welcomeModal = document.getElementById('welcome-modal');
     const startMissionBtn = document.getElementById('start-mission-btn');
     const infoModal = document.getElementById('info-modal');
@@ -635,121 +608,111 @@
     const closeInfoModalBtn = document.getElementById('close-info-modal');
     const closeHelpModalBtn = document.getElementById('close-help-modal');
 
-
-    // Triangle data
     const triangleData = [
       {
         name: "Region Alpha",
-        sides: [12, 8, 0], // SSS example initial knowns
-        angles: [0, 0, 0], // Initially unknown
+        sides: [12, 8, 0],
+        angles: [0, 0, 0],
         color: 0xff5555,
         defaultProblem: 'SSS',
-        position: new THREE.Vector3(-8, 0.1, -5) // Position for this region
+        position: new THREE.Vector3(-8, 0.1, -5)
       },
       {
         name: "Region Beta",
-        sides: [9, 0, 11], // SAS example initial knowns (assume angle B is known)
-        angles: [0, 45, 0], // Angle B = 45 degrees known
+        sides: [9, 0, 11],
+        angles: [0, 45, 0],
         color: 0x55ff55,
         defaultProblem: 'SAS',
         position: new THREE.Vector3(5, 0.1, -8)
       },
       {
         name: "Region Gamma",
-        sides: [0, 7, 0], // AAS example initial knowns (assume angles A, C and side b known)
-        angles: [50, 0, 60], // Angles A=50, C=60 known
+        sides: [0, 7, 0],
+        angles: [50, 0, 60],
         color: 0x5555ff,
-        defaultProblem: 'AAS', // Changed to AAS
+        defaultProblem: 'AAS',
         position: new THREE.Vector3(0, 0.1, 9)
       }
     ];
 
-    // Initialize loading
     function initLoading() {
       loadingScreen.style.display = 'flex';
       welcomeModal.style.display = 'none';
-
       let progress = 0;
       const loadingInterval = setInterval(() => {
-        progress += Math.random() * 5 + 2; // Slightly faster loading
+        progress += Math.random() * 5 + 2;
         if (progress >= 100) {
           progress = 100;
           clearInterval(loadingInterval);
           setTimeout(() => {
             loadingScreen.style.display = 'none';
-            welcomeModal.style.display = 'block';
+            gsap.from(welcomeModal, { duration: 0.5, opacity: 0, y: -30, ease: "power2.out", onStart: () => welcomeModal.style.display = 'block' });
           }, 500);
         }
         progressBar.style.width = `${progress}%`;
         loadingText.textContent = `Loading assets... ${Math.floor(progress)}%`;
-      }, 80); // Faster interval
+      }, 80);
     }
 
-     // Function to dynamically load OrbitControls
-     function loadScript(url, callback) {
-        const script = document.createElement('script');
-        script.type = 'text/javascript';
-        script.src = url;
-        script.onload = callback;
-        script.onerror = () => console.error(`Failed to load script: ${url}`);
-        document.head.appendChild(script);
+    function loadScript(url, callback) {
+      const script = document.createElement('script');
+      script.type = 'text/javascript';
+      script.src = url;
+      script.onload = callback;
+      script.onerror = () => console.error(`Failed to load script: ${url}`);
+      document.head.appendChild(script);
     }
 
-    // Initialize Three.js scene
     function initScene() {
       scene = new THREE.Scene();
       scene.background = new THREE.Color(0x050520);
-      scene.fog = new THREE.Fog(0x050520, 50, 150); // Add subtle fog
+      scene.fog = new THREE.Fog(0x050520, 50, 150);
 
-      camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000); // Slightly narrower FOV
-      camera.position.set(0, 25, 40); // Start further back
+      camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+      camera.position.set(0, 25, 40);
       camera.lookAt(0, 0, 0);
 
       renderer = new THREE.WebGLRenderer({ antialias: true });
       renderer.setSize(window.innerWidth, window.innerHeight);
       renderer.shadowMap.enabled = true;
-      renderer.shadowMap.type = THREE.PCFSoftShadowMap; // Softer shadows
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
       document.getElementById('canvas-container').appendChild(renderer.domElement);
 
-      // Improved lighting
-      const ambientLight = new THREE.AmbientLight(0x607080, 0.8); // Slightly brighter ambient
+      const ambientLight = new THREE.AmbientLight(0x607080, 0.8);
       scene.add(ambientLight);
 
-      const directionalLight = new THREE.DirectionalLight(0xffffff, 1.0); // Stronger directional
+      const directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
       directionalLight.position.set(15, 30, 20);
       directionalLight.castShadow = true;
       directionalLight.shadow.mapSize.width = 1024;
       directionalLight.shadow.mapSize.height = 1024;
       directionalLight.shadow.camera.near = 0.5;
       directionalLight.shadow.camera.far = 100;
-       // Adjust shadow camera bounds to cover island area
-       directionalLight.shadow.camera.left = -30;
-       directionalLight.shadow.camera.right = 30;
-       directionalLight.shadow.camera.top = 30;
-       directionalLight.shadow.camera.bottom = -30;
+      directionalLight.shadow.camera.left = -30;
+      directionalLight.shadow.camera.right = 30;
+      directionalLight.shadow.camera.top = 30;
+      directionalLight.shadow.camera.bottom = -30;
       scene.add(directionalLight);
 
       const hemisphereLight = new THREE.HemisphereLight(0x87CEEB, 0x556B2F, 0.6);
       scene.add(hemisphereLight);
 
-
-       // Load OrbitControls dynamically
-       loadScript('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js', () => {
-            if (typeof THREE.OrbitControls === 'function') {
-                controls = new THREE.OrbitControls(camera, renderer.domElement);
-                controls.enableDamping = true; // Smooth camera movement
-                controls.dampingFactor = 0.1;
-                controls.screenSpacePanning = false; // Keep panning relative to ground
-                controls.minDistance = 5;
-                controls.maxDistance = 100;
-                controls.maxPolarAngle = Math.PI / 2 - 0.05; // Prevent camera going below ground slightly
-                controls.target.set(0, 0, 0); // Set initial target
-                controls.update();
-                console.log("OrbitControls loaded and initialized.");
-            } else {
-                console.error("THREE.OrbitControls not found after loading script.");
-            }
-        });
+      loadScript('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js', () => {
+        if (typeof THREE.OrbitControls === 'function') {
+          controls = new THREE.OrbitControls(camera, renderer.domElement);
+          controls.enableDamping = true;
+          controls.dampingFactor = 0.1;
+          controls.screenSpacePanning = false;
+          controls.minDistance = 5;
+          controls.maxDistance = 100;
+          controls.maxPolarAngle = Math.PI / 2 - 0.05;
+          controls.target.set(0, 0, 0);
+          controls.update();
+          console.log("OrbitControls loaded and initialized.");
+        } else {
+          console.error("THREE.OrbitControls not found after loading script.");
+        }
+      });
 
       createIsland();
       createTriangleRegions();
@@ -757,8 +720,8 @@
       createPolarGroup();
       createParametricGroup();
 
-      const gridHelper = new THREE.GridHelper(60, 60, 0x555555, 0x333333); // Larger grid
-      gridHelper.position.y = -0.05; // Slightly below island/water
+      const gridHelper = new THREE.GridHelper(60, 60, 0x555555, 0x333333);
+      gridHelper.position.y = -0.05;
       scene.add(gridHelper);
 
       window.addEventListener('resize', () => {
@@ -770,28 +733,23 @@
       animate();
     }
 
-    // Create island base
     function createIsland() {
       island = new THREE.Group();
       scene.add(island);
-
-      // More detailed island shape
       const islandShape = new THREE.Shape();
       const islandRadius = 20;
       const segments = 64;
       for (let i = 0; i <= segments; i++) {
-          const theta = (i / segments) * Math.PI * 2;
-          const radiusVariation = 1 + Math.sin(theta * 5) * 0.2 + Math.cos(theta * 2) * 0.15; // Irregular edge
-          const x = Math.cos(theta) * islandRadius * radiusVariation;
-          const y = Math.sin(theta) * islandRadius * radiusVariation;
-          if (i === 0) islandShape.moveTo(x, y);
-          else islandShape.lineTo(x, y);
+        const theta = (i / segments) * Math.PI * 2;
+        const radiusVariation = 1 + Math.sin(theta * 5) * 0.2 + Math.cos(theta * 2) * 0.15;
+        const x = Math.cos(theta) * islandRadius * radiusVariation;
+        const y = Math.sin(theta) * islandRadius * radiusVariation;
+        if (i === 0) islandShape.moveTo(x, y);
+        else islandShape.lineTo(x, y);
       }
-
       const islandGeometry = new THREE.ShapeGeometry(islandShape);
       const islandMaterial = new THREE.MeshStandardMaterial({
-        // color: 0x90ee90, // Lighter green
-        map: createTerrainTexture(), // Add texture
+        map: createTerrainTexture(),
         roughness: 0.9,
         metalness: 0.1
       });
@@ -800,36 +758,31 @@
       islandMesh.receiveShadow = true;
       island.add(islandMesh);
 
-      // Water plane
-      const waterGeometry = new THREE.PlaneGeometry(200, 200); // Larger water plane
-       // Simple water texture (procedural noise could be better)
-       const waterCanvas = document.createElement('canvas');
-       waterCanvas.width = 64; waterCanvas.height = 64;
-       const waterCtx = waterCanvas.getContext('2d');
-       waterCtx.fillStyle = '#0077be'; // Base blue
-       waterCtx.fillRect(0,0,64,64);
-       waterCtx.fillStyle = 'rgba(255,255,255,0.2)'; // Add light ripples
-       for(let i=0; i<50; i++){ waterCtx.fillRect(Math.random()*64, Math.random()*64, 2, 1);}
-       const waterTexture = new THREE.CanvasTexture(waterCanvas);
-       waterTexture.wrapS = waterTexture.wrapT = THREE.RepeatWrapping;
-       waterTexture.repeat.set(10, 10);
-
+      const waterGeometry = new THREE.PlaneGeometry(200, 200);
+      const waterCanvas = document.createElement('canvas');
+      waterCanvas.width = 64; waterCanvas.height = 64;
+      const waterCtx = waterCanvas.getContext('2d');
+      waterCtx.fillStyle = '#0077be';
+      waterCtx.fillRect(0,0,64,64);
+      waterCtx.fillStyle = 'rgba(255,255,255,0.2)';
+      for(let i=0; i<50; i++){ waterCtx.fillRect(Math.random()*64, Math.random()*64, 2, 1);}
+      const waterTexture = new THREE.CanvasTexture(waterCanvas);
+      waterTexture.wrapS = waterTexture.wrapT = THREE.RepeatWrapping;
+      waterTexture.repeat.set(10, 10);
       const waterMaterial = new THREE.MeshStandardMaterial({
-        // color: 0x0077be,
         map: waterTexture,
         transparent: true,
         opacity: 0.85,
         roughness: 0.2,
         metalness: 0.3,
-        envMapIntensity: 0.5 // Add slight reflection if env map is present
+        envMapIntensity: 0.5
       });
       const waterMesh = new THREE.Mesh(waterGeometry, waterMaterial);
       waterMesh.rotation.x = -Math.PI / 2;
       waterMesh.position.y = -0.2;
-      waterMesh.receiveShadow = true; // Water can receive shadows
+      waterMesh.receiveShadow = true;
       scene.add(waterMesh);
 
-      // Add mountains (more varied)
       for (let i = 0; i < 7; i++) {
         const angle = Math.random() * Math.PI * 2;
         const radius = 10 + Math.random() * 8;
@@ -837,474 +790,391 @@
         const z = Math.sin(angle) * radius;
         const baseSize = 1.5 + Math.random() * 1.5;
         const height = 3 + Math.random() * 4;
-
-        const coneGeometry = new THREE.ConeGeometry(baseSize, height, 6 + Math.floor(Math.random() * 4)); // Varied sides
-        const coneMaterial = new THREE.MeshStandardMaterial({ color: 0x665544, roughness: 0.8 }); // Browner rock
+        const coneGeometry = new THREE.ConeGeometry(baseSize, height, 6 + Math.floor(Math.random() * 4));
+        const coneMaterial = new THREE.MeshStandardMaterial({ color: 0x665544, roughness: 0.8 });
         const cone = new THREE.Mesh(coneGeometry, coneMaterial);
-        cone.position.set(x, height / 2 - 0.1, z); // Position base on island
+        cone.position.set(x, height / 2 - 0.1, z);
         cone.castShadow = true;
         cone.receiveShadow = true;
         island.add(cone);
       }
 
-      // Add trees (simple pines)
       for (let i = 0; i < 40; i++) {
         const angle = Math.random() * Math.PI * 2;
-        const radius = 3 + Math.random() * 15; // Wider distribution
-        // Avoid placing trees directly on mountain peaks (simple check)
+        const radius = 3 + Math.random() * 15;
         let tooCloseToMountain = false;
         const x = Math.cos(angle) * radius;
         const z = Math.sin(angle) * radius;
         island.children.forEach(child => {
-            if(child.geometry instanceof THREE.ConeGeometry){
-                if(child.position.distanceTo(new THREE.Vector3(x, 0, z)) < child.geometry.parameters.radius * 1.5) {
-                    tooCloseToMountain = true;
-                }
+          if(child.geometry instanceof THREE.ConeGeometry){
+            if(child.position.distanceTo(new THREE.Vector3(x, 0, z)) < child.geometry.parameters.radius * 1.5) {
+              tooCloseToMountain = true;
             }
+          }
         });
-        if(tooCloseToMountain || radius > islandRadius * 0.9) continue; // Skip if too close or off edge
-
+        if(tooCloseToMountain || radius > islandRadius * 0.9) continue;
         const trunkHeight = 0.8 + Math.random() * 0.7;
         const trunkGeometry = new THREE.CylinderGeometry(0.15, 0.15, trunkHeight, 6);
         const trunkMaterial = new THREE.MeshStandardMaterial({ color: 0x5C4033, roughness: 0.9 });
         const trunk = new THREE.Mesh(trunkGeometry, trunkMaterial);
         trunk.position.set(x, trunkHeight / 2 - 0.1, z);
         trunk.castShadow = true;
-
         const leavesHeight = 1.5 + Math.random();
         const leavesGeometry = new THREE.ConeGeometry(0.6 + Math.random() * 0.3, leavesHeight, 7);
         const leavesMaterial = new THREE.MeshStandardMaterial({ color: 0x228B22, roughness: 0.8 });
         const leaves = new THREE.Mesh(leavesGeometry, leavesMaterial);
-        leaves.position.set(0, trunkHeight / 2 + leavesHeight / 2 - 0.1, 0); // Position leaves on top of trunk
+        leaves.position.set(0, trunkHeight / 2 + leavesHeight / 2 - 0.1, 0);
         leaves.castShadow = true;
-
         trunk.add(leaves);
         island.add(trunk);
       }
-
-      // Add coordinate axes (optional, can be toggled)
-      // const axesHelper = new THREE.AxesHelper(25);
-      // scene.add(axesHelper);
     }
 
-    // Simple procedural terrain texture
     function createTerrainTexture() {
-        const size = 128;
-        const canvas = document.createElement('canvas');
-        canvas.width = size;
-        canvas.height = size;
-        const ctx = canvas.getContext('2d');
-
-        // Base grass/dirt color
-        ctx.fillStyle = `hsl(${90 + Math.random()*30}, 40%, 35%)`; // Greenish-brown range
-        ctx.fillRect(0, 0, size, size);
-
-        // Add noise/variation
-        for (let i = 0; i < 8000; i++) {
-            const x = Math.random() * size;
-            const y = Math.random() * size;
-            const shade = Math.random() * 0.2 + 0.9; // 0.9 to 1.1
-            const baseColor = `hsl(${90 + Math.random()*30}, 40%, ${35 * shade}%)`;
-            ctx.fillStyle = baseColor;
-            ctx.fillRect(x, y, 2, 2); // Small patches
-        }
-        return new THREE.CanvasTexture(canvas);
+      const size = 128;
+      const canvas = document.createElement('canvas');
+      canvas.width = size;
+      canvas.height = size;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = `hsl(${90 + Math.random()*30}, 40%, 35%)`;
+      ctx.fillRect(0, 0, size, size);
+      for (let i = 0; i < 8000; i++) {
+        const x = Math.random() * size;
+        const y = Math.random() * size;
+        const shade = Math.random() * 0.2 + 0.9;
+        const baseColor = `hsl(${90 + Math.random()*30}, 40%, ${35 * shade}%)`;
+        ctx.fillStyle = baseColor;
+        ctx.fillRect(x, y, 2, 2);
+      }
+      return new THREE.CanvasTexture(canvas);
     }
 
-
-    // Create triangulation module objects
     function createTriangleRegions() {
       triangleGroup = new THREE.Group();
       scene.add(triangleGroup);
-
       triangleData.forEach((data, index) => {
         const triangleGeometry = new THREE.BufferGeometry();
-        // Define placeholder vertices - will be updated by solveTriangle/updateTriangleGeometry
         const vertices = new Float32Array([
           0, 0, 0,
           1, 0, 0,
-          0.5, 0, Math.sqrt(0.75) // Equilateral triangle base
+          0.5, 0, Math.sqrt(0.75)
         ]);
         triangleGeometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
         triangleGeometry.computeVertexNormals();
-
         const triangleMaterial = new THREE.MeshStandardMaterial({
           color: data.color,
           transparent: true,
           opacity: 0.75,
           side: THREE.DoubleSide,
-          depthWrite: false // Helps prevent z-fighting with markers/grid
+          depthWrite: false
         });
         const triangleMesh = new THREE.Mesh(triangleGeometry, triangleMaterial);
-        triangleMesh.castShadow = false; // Triangles themselves don't need to cast shadows
+        triangleMesh.castShadow = false;
         triangleMesh.receiveShadow = true;
         triangleMesh.userData = { regionIndex: index, name: data.name };
-        triangleMesh.position.copy(data.position); // Set position for this region
-
+        triangleMesh.position.copy(data.position);
         triangleGroup.add(triangleMesh);
         triangleRegions.push(triangleMesh);
-
-        // Initial markers based on default data (might be incomplete)
-        addTriangleMarkers(triangleMesh, data);
       });
-
-      // Hide by default
       triangleGroup.visible = false;
     }
 
-    // Add markers for known triangle values
-    function addTriangleMarkers(triangleMesh, data) {
-       // Remove previous markers first
-       while(triangleMesh.children.length > 0) {
-           triangleMesh.remove(triangleMesh.children[0]);
-       }
+    function makeTextSprite(message, parameters) {
+      const fontface = parameters.fontface || 'Arial';
+      const fontsize = parameters.fontsize || 18;
+      const borderThickness = parameters.borderThickness === undefined ? 1 : parameters.borderThickness;
+      const borderColor = parameters.borderColor || { r:0, g:0, b:0, a:1.0 };
+      const backgroundColor = parameters.backgroundColor || { r:255, g:255, b:255, a:0.8 };
+      const textColor = parameters.textColor || { r:0, g:0, b:0, a:1.0 };
 
-       const positions = triangleMesh.geometry.attributes.position;
-       if (!positions) return; // Geometry not ready
-
-       // Helper to create text sprite
-       function makeTextSprite(message, parameters) {
-            const fontface = parameters.fontface || 'Arial';
-            const fontsize = parameters.fontsize || 18;
-            const borderThickness = parameters.borderThickness || 1;
-            const borderColor = parameters.borderColor || { r:0, g:0, b:0, a:1.0 };
-            const backgroundColor = parameters.backgroundColor || { r:255, g:255, b:255, a:0.8 };
-            const textColor = parameters.textColor || { r:0, g:0, b:0, a:1.0 };
-
-            const canvas = document.createElement('canvas');
-            const context = canvas.getContext('2d');
-            context.font = "Bold " + fontsize + "px " + fontface;
-            const metrics = context.measureText( message );
-            const textWidth = metrics.width;
-
-            canvas.width = textWidth + borderThickness*2 + 10; // Add padding
-            canvas.height = fontsize * 1.4 + borderThickness*2; // Add padding
-            context.font = "Bold " + fontsize + "px " + fontface; // Re-set font after resize
-
-            // Background
-            context.fillStyle   = "rgba(" + backgroundColor.r + "," + backgroundColor.g + "," + backgroundColor.b + "," + backgroundColor.a + ")";
-            // Border
-            context.strokeStyle = "rgba(" + borderColor.r + "," + borderColor.g + "," + borderColor.b + "," + borderColor.a + ")";
-            context.lineWidth = borderThickness;
-            // roundRect(context, borderThickness/2, borderThickness/2, textWidth + borderThickness + 10, fontsize * 1.4 + borderThickness, 6); // Requires roundRect function
-            context.fillStyle = "rgba(" + backgroundColor.r + "," + backgroundColor.g + "," + backgroundColor.b + "," + backgroundColor.a + ")";
-            context.fillRect(borderThickness/2, borderThickness/2, textWidth + borderThickness + 10, fontsize * 1.4 + borderThickness);
-
-            // Text
-            context.fillStyle = "rgba("+textColor.r+", "+textColor.g+", "+textColor.b+", "+textColor.a+")";
-            context.fillText( message, borderThickness+5, fontsize + borderThickness); // Adjust position
-
-            const texture = new THREE.Texture(canvas);
-            texture.needsUpdate = true;
-
-            const spriteMaterial = new THREE.SpriteMaterial( { map: texture } );
-            const sprite = new THREE.Sprite( spriteMaterial );
-            sprite.scale.set(3, 1.5, 1.0); // Adjust sprite size
-            return sprite;
-       }
-
-      // Add Side Length Markers (midpoints)
-      for (let i = 0; i < 3; i++) {
-        const sideIndex = i; // 0=a (opp A), 1=b (opp B), 2=c (opp C)
-        const sideValue = data.sides[sideIndex];
-        if (sideValue > 0) {
-            const vertexIndices = [(i+1)%3, (i+2)%3]; // Vertices defining the side
-            const v1 = new THREE.Vector3().fromBufferAttribute(positions, vertexIndices[0]);
-            const v2 = new THREE.Vector3().fromBufferAttribute(positions, vertexIndices[1]);
-            const midPoint = new THREE.Vector3().addVectors(v1, v2).multiplyScalar(0.5);
-            midPoint.y += 0.15; // Lift slightly above triangle
-
-            const sideLabel = String.fromCharCode(97 + sideIndex); // a, b, c
-            const textSprite = makeTextSprite(`${sideLabel}=${sideValue.toFixed(1)}`, { fontsize: 14, backgroundColor: { r:255, g:255, b:100, a:0.8 } }); // Yellowish background
-            textSprite.position.copy(midPoint);
-            triangleMesh.add(textSprite);
-        }
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
+      context.font = "Bold " + fontsize + "px " + fontface;
+      const metrics = context.measureText( message );
+      const textWidth = metrics.width;
+      const canvasWidth = textWidth + borderThickness*2 + 10;
+      const canvasHeight = fontsize * 1.4 + borderThickness*2;
+      canvas.width = canvasWidth;
+      canvas.height = canvasHeight;
+      context.font = "Bold " + fontsize + "px " + fontface;
+      context.textAlign = 'center';
+      context.textBaseline = 'middle';
+      context.fillStyle = "rgba(" + backgroundColor.r + "," + backgroundColor.g + "," + backgroundColor.b + "," + backgroundColor.a + ")";
+      context.strokeStyle = "rgba(" + borderColor.r + "," + borderColor.g + "," + borderColor.b + "," + borderColor.a + ")";
+      context.lineWidth = borderThickness;
+      const radius = 5;
+      context.beginPath();
+      context.moveTo(radius, 0);
+      context.lineTo(canvasWidth - radius, 0);
+      context.quadraticCurveTo(canvasWidth, 0, canvasWidth, radius);
+      context.lineTo(canvasWidth, canvasHeight - radius);
+      context.quadraticCurveTo(canvasWidth, canvasHeight, canvasWidth - radius, canvasHeight);
+      context.lineTo(radius, canvasHeight);
+      context.quadraticCurveTo(0, canvasHeight, 0, canvasHeight - radius);
+      context.lineTo(0, radius);
+      context.quadraticCurveTo(0, 0, radius, 0);
+      context.closePath();
+      context.fill();
+      if (borderThickness > 0) {
+        context.stroke();
       }
-
-       // Add Angle Markers (at vertices)
-       for (let i = 0; i < 3; i++) {
-           const angleValue = data.angles[i];
-           if (angleValue > 0) {
-               const vertexPos = new THREE.Vector3().fromBufferAttribute(positions, i);
-               vertexPos.y += 0.15; // Lift slightly
-
-               // Simple indicator (e.g., small sphere) - Text is better
-               // const markerGeometry = new THREE.SphereGeometry(0.15, 8, 8);
-               // const markerMaterial = new THREE.MeshBasicMaterial({ color: 0x00ffff }); // Cyan
-               // const marker = new THREE.Mesh(markerGeometry, markerMaterial);
-               // marker.position.copy(vertexPos);
-               // triangleMesh.add(marker);
-
-               const angleLabel = String.fromCharCode(65 + i); // A, B, C
-               const textSprite = makeTextSprite(`${angleLabel}=${angleValue.toFixed(0)}°`, { fontsize: 14, backgroundColor: { r:100, g:200, b:255, a:0.8 } }); // Bluish background
-               textSprite.position.copy(vertexPos);
-               // Offset slightly based on angle to avoid overlap with side labels? (Complex)
-               triangleMesh.add(textSprite);
-           }
-       }
+      context.fillStyle = "rgba("+textColor.r+", "+textColor.g+", "+textColor.b+", "+textColor.a+")";
+      context.fillText( message, canvasWidth / 2, canvasHeight / 2);
+      const texture = new THREE.Texture(canvas);
+      texture.needsUpdate = true;
+      const spriteMaterial = new THREE.SpriteMaterial( { map: texture } );
+      const sprite = new THREE.Sprite( spriteMaterial );
+      const aspect = canvasWidth / canvasHeight;
+      sprite.scale.set(aspect * 1.5, 1.5, 1.0);
+      return sprite;
     }
 
-    // Create vector module objects
+    function addTriangleMarkers(triangleMesh, data) {
+      while(triangleMesh.children.length > 0) {
+        const child = triangleMesh.children[0];
+        if (child instanceof THREE.Sprite) {
+          if (child.material.map) child.material.map.dispose();
+          child.material.dispose();
+        } else if (child.geometry) {
+          child.geometry.dispose();
+          if (child.material) {
+            if (child.material.map) child.material.map.dispose();
+            child.material.dispose();
+          }
+        }
+        triangleMesh.remove(child);
+      }
+      const positions = triangleMesh.geometry.attributes.position;
+      if (!positions) return;
+      const vertices = [
+        new THREE.Vector3().fromBufferAttribute(positions, 0),
+        new THREE.Vector3().fromBufferAttribute(positions, 1),
+        new THREE.Vector3().fromBufferAttribute(positions, 2)
+      ];
+      const sides = [
+        { index: 0, value: data.sides[0], label: 'a', v1: vertices[1], v2: vertices[2] },
+        { index: 1, value: data.sides[1], label: 'b', v1: vertices[0], v2: vertices[2] },
+        { index: 2, value: data.sides[2], label: 'c', v1: vertices[0], v2: vertices[1] }
+      ];
+      sides.forEach(side => {
+        if (side.value > 0) {
+          const midPoint = new THREE.Vector3().addVectors(side.v1, side.v2).multiplyScalar(0.5);
+          const direction = new THREE.Vector3().subVectors(side.v2, side.v1).normalize();
+          const triangleNormal = new THREE.Vector3(0, 1, 0);
+          const outwardNormal = new THREE.Vector3().crossVectors(direction, triangleNormal).normalize();
+          midPoint.addScaledVector(outwardNormal, 0.3);
+          midPoint.y += 0.1;
+          const textSprite = makeTextSprite(`${side.label}=${side.value.toFixed(1)}`, {
+            fontsize: 16,
+            backgroundColor: { r:255, g:255, b:100, a:0.8 },
+            textColor: { r:50, g:50, b:0, a:1.0 }
+          });
+          textSprite.position.copy(midPoint);
+          triangleMesh.add(textSprite);
+        }
+      });
+      const angles = [
+        { index: 0, value: data.angles[0], label: 'A', pos: vertices[0] },
+        { index: 1, value: data.angles[1], label: 'B', pos: vertices[1] },
+        { index: 2, value: data.angles[2], label: 'C', pos: vertices[2] }
+      ];
+      angles.forEach(angle => {
+        if (angle.value > 0) {
+          const vertexPos = angle.pos.clone();
+          const center = new THREE.Vector3()
+                            .add(vertices[0])
+                            .add(vertices[1])
+                            .add(vertices[2])
+                            .multiplyScalar(1/3);
+          const inwardDir = new THREE.Vector3().subVectors(center, vertexPos).normalize();
+          vertexPos.addScaledVector(inwardDir, 0.4);
+          vertexPos.y += 0.1;
+          const textSprite = makeTextSprite(`${angle.label}=${angle.value.toFixed(0)}°`, {
+            fontsize: 16,
+            backgroundColor: { r:100, g:200, b:255, a:0.8 },
+            textColor: { r:0, g:0, b:100, a:1.0 }
+          });
+          textSprite.position.copy(vertexPos);
+          triangleMesh.add(textSprite);
+        }
+      });
+    }
+
     function createVectorGroup() {
       vectorGroup = new THREE.Group();
       scene.add(vectorGroup);
-      vectorGroup.position.set(0, 0.5, 0); // Lift the origin slightly
-
+      vectorGroup.position.set(0, 0.5, 0);
       const originGeometry = new THREE.SphereGeometry(0.3, 16, 16);
       const originMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
       const origin = new THREE.Mesh(originGeometry, originMaterial);
       vectorGroup.add(origin);
-
-      // Initial vectors
-      updateVectors(); // Create vectors based on default input values
-
+      updateVectors();
       vectorGroup.visible = false;
     }
 
-    // Create or update a vector arrow
     function createVector(name, x, y, z, color) {
-      if (vectorArrows[name]) {
-        vectorGroup.remove(vectorArrows[name]); // Remove old arrow
-        // Also remove associated label if it exists
-        const oldLabel = vectorGroup.children.find(child => child.userData.isLabel && child.userData.arrowName === name);
-        if (oldLabel) vectorGroup.remove(oldLabel);
+      const existingArrow = vectorArrows[name];
+      const existingLabel = vectorGroup.children.find(child => child.userData.isLabel && child.userData.arrowName === name);
+      if (existingArrow) vectorGroup.remove(existingArrow);
+      if (existingLabel) {
+        if (existingLabel.material.map) existingLabel.material.map.dispose();
+        existingLabel.material.dispose();
+        vectorGroup.remove(existingLabel);
       }
-
       const length = Math.sqrt(x * x + y * y + z * z);
-      if (length < 0.01) { // Don't draw zero-length vectors
-          vectorArrows[name] = null;
-          return null;
+      if (length < 0.01) {
+        vectorArrows[name] = null;
+        return null;
       }
-
       const dir = new THREE.Vector3(x, y, z).normalize();
       const origin = new THREE.Vector3(0, 0, 0);
-
-      // Use ArrowHelper
-      const arrow = new THREE.ArrowHelper(dir, origin, length, color, length * 0.2, length * 0.1); // Head size relative to length
-      arrow.userData.vectorData = {x, y, z}; // Store original data
-
+      const headLength = Math.min(length * 0.2, 1.0);
+      const headWidth = Math.min(length * 0.1, 0.5);
+      const arrow = new THREE.ArrowHelper(dir, origin, length, color, headLength, headWidth);
+      arrow.userData.vectorData = {x, y, z};
       vectorGroup.add(arrow);
       vectorArrows[name] = arrow;
-
-      // Add a text label near the arrowhead
-       function makeTextSprite(message, parameters) { // Reusing function from triangles
-            const fontface = parameters.fontface || 'Arial';
-            const fontsize = parameters.fontsize || 16;
-            const borderThickness = 0; // No border for vector labels
-            const backgroundColor = parameters.backgroundColor || { r:50, g:50, b:50, a:0.7 };
-            const textColor = parameters.textColor || { r:255, g:255, b:255, a:1.0 };
-
-            const canvas = document.createElement('canvas');
-            const context = canvas.getContext('2d');
-            context.font = fontsize + "px " + fontface;
-            const metrics = context.measureText( message );
-            const textWidth = metrics.width;
-
-            canvas.width = textWidth + 10; // Padding
-            canvas.height = fontsize * 1.4; // Padding
-            context.font = fontsize + "px " + fontface; // Re-set font
-
-            context.fillStyle   = "rgba(" + backgroundColor.r + "," + backgroundColor.g + "," + backgroundColor.b + "," + backgroundColor.a + ")";
-            context.fillRect(0, 0, canvas.width, canvas.height);
-
-            context.fillStyle = "rgba("+textColor.r+", "+textColor.g+", "+textColor.b+", "+textColor.a+")";
-            context.fillText( message, 5, fontsize); // Adjust position
-
-            const texture = new THREE.Texture(canvas);
-            texture.needsUpdate = true;
-            const spriteMaterial = new THREE.SpriteMaterial( { map: texture } );
-            const sprite = new THREE.Sprite( spriteMaterial );
-            sprite.scale.set(2, 1, 1.0); // Adjust sprite size
-            return sprite;
-       }
-       const labelText = `${name}: (${x.toFixed(1)}, ${y.toFixed(1)}, ${z.toFixed(1)})`;
-       const textSprite = makeTextSprite(labelText, {textColor: { r:color >> 16 & 255, g:color >> 8 & 255, b:color & 255, a:1.0 } }); // Use vector color
-       textSprite.position.set(x * 1.1, y * 1.1, z * 1.1); // Position slightly past arrowhead
-       textSprite.userData = { isLabel: true, arrowName: name }; // Mark as label
-       vectorGroup.add(textSprite);
-
-
+      const labelText = `${name.replace('vector', 'v')}: (${x.toFixed(1)}, ${y.toFixed(1)}, ${z.toFixed(1)})`;
+      const textSprite = makeTextSprite(labelText, {
+        fontsize: 16,
+        backgroundColor: { r:50, g:50, b:50, a:0.7 },
+        textColor: { r: color >> 16 & 255, g: color >> 8 & 255, b: color & 255, a: 1.0 },
+        borderThickness: 0
+      });
+      const labelPos = new THREE.Vector3(x, y, z).multiplyScalar(1.05).add(new THREE.Vector3(0, headLength * 0.5, 0));
+      textSprite.position.copy(labelPos);
+      textSprite.userData = { isLabel: true, arrowName: name };
+      vectorGroup.add(textSprite);
       return arrow;
     }
 
-    // Create polar module objects
     function createPolarGroup() {
       polarGroup = new THREE.Group();
-      polarGroup.position.set(0, 0.1, 0); // Lift slightly
+      polarGroup.position.set(0, 0.1, 0);
       scene.add(polarGroup);
-
-      // Origin marker (optional)
-      // const originGeometry = new THREE.SphereGeometry(0.2, 16, 16);
-      // const originMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
-      // const origin = new THREE.Mesh(originGeometry, originMaterial);
-      // polarGroup.add(origin);
-
-      const gridHelper = new THREE.PolarGridHelper(10, 16, 8, 64, 0xaaaaaa, 0x666666); // Lighter grid lines
-      gridHelper.position.y = 0.05; // Position grid slightly below curve
+      const gridHelper = new THREE.PolarGridHelper(10, 16, 8, 64, 0xaaaaaa, 0x666666);
+      gridHelper.position.y = 0.05;
       polarGroup.add(gridHelper);
-
       polarGroup.visible = false;
-       // Initial curve based on defaults
-       updatePolarCurve();
+      updatePolarCurve();
     }
 
-    // Create or update polar curve
     function createPolarCurve(type, a, n) {
       if (polarCurve) {
         polarGroup.remove(polarCurve);
-        polarCurve.geometry.dispose(); // Dispose old geometry
-        polarCurve.material.dispose(); // Dispose old material
+        polarCurve.geometry.dispose();
+        polarCurve.material.dispose();
         polarCurve = null;
       }
-      // If there was a surface, remove it too
       const oldSurface = polarGroup.children.find(child => child.userData && child.userData.isPolarSurface);
       if (oldSurface) {
-          polarGroup.remove(oldSurface);
-          oldSurface.geometry.dispose();
-          oldSurface.material.dispose();
+        polarGroup.remove(oldSurface);
+        oldSurface.geometry.dispose();
+        oldSurface.material.dispose();
       }
-
-
       const points = [];
       const segments = 500;
-      // Adjust range for spiral
-      const maxTheta = (type === 'spiral') ? Math.PI * 6 : Math.PI * 2; // Longer spiral
-
+      const maxTheta = (type === 'spiral') ? Math.PI * 6 : Math.PI * 2;
       for (let i = 0; i <= segments; i++) {
         const theta = (i / segments) * maxTheta;
         let r = 0;
         let validPoint = true;
-
-        try { // Add try-catch for safety
-            switch (type) {
-              case 'rose':
-                r = a * Math.cos(n * theta);
-                break;
-              case 'limaçon': // r = a + b*cos(theta). Let b=2 for simplicity here. Needs parameter 'b'.
-                // For now, let's use a simpler limacon r = 1 + a * cos(theta)
-                r = 1 + a * Math.cos(theta);
-                if (r < 0 && Math.abs(r) > a - 1) { // Basic check for inner loop issues
-                    // Could skip or handle negative r differently
-                }
-                break;
-              case 'lemniscate': // r^2 = a^2 * cos(2*theta)
-                 const cos2Theta = Math.cos(2 * theta);
-                 if (cos2Theta >= 0) {
-                     r = a * Math.sqrt(cos2Theta); // Use 'a' as the scale factor directly
-                 } else {
-                     r = 0; // Set r=0 where it's undefined (avoids gaps)
-                     // validPoint = false; // Or skip points where r would be imaginary
-                 }
-                 break;
-              case 'cardioid': // r = a * (1 + cos(theta))
-                r = a * (1 + Math.cos(theta));
-                break;
-              case 'spiral': // r = a * theta / (2*pi)
-                r = a * theta / (Math.PI * 2); // Scale spiral reasonably
-                break;
-             default: validPoint = false;
-            }
-
-            if (validPoint && !isNaN(r)) {
-                const x = r * Math.cos(theta);
-                const z = r * Math.sin(theta); // Use Z for the ground plane
-                points.push(new THREE.Vector3(x, 0.1, z)); // Elevate slightly above grid
-            }
+        try {
+          switch (type) {
+            case 'rose':
+              r = a * Math.cos(n * theta);
+              break;
+            case 'limaçon':
+              r = 1 + a * Math.cos(theta);
+              if (r < 0) validPoint = false;
+              break;
+            case 'lemniscate':
+              const cos2Theta = Math.cos(2 * theta);
+              if (cos2Theta >= 0) {
+                r = a * Math.sqrt(cos2Theta);
+              } else {
+                validPoint = false;
+              }
+              break;
+            case 'cardioid':
+              r = a * (1 + Math.cos(theta));
+              break;
+            case 'spiral':
+              r = a * theta / (Math.PI * 2);
+              break;
+            default: validPoint = false;
+          }
+          if (validPoint && !isNaN(r) && isFinite(r)) {
+            const x = r * Math.cos(theta);
+            const z = r * Math.sin(theta);
+            points.push(new THREE.Vector3(x, 0.1, z));
+          }
         } catch (e) {
-            console.error("Error calculating polar point:", type, theta, r, e);
+          console.error("Error calculating polar point:", type, theta, r, e);
         }
       }
-
-       if (points.length > 1) {
-          const curveGeometry = new THREE.BufferGeometry().setFromPoints(points);
-          const curveMaterial = new THREE.LineBasicMaterial({ color: 0xff00ff, linewidth: 3 }); // Thicker line
-          const curve = new THREE.Line(curveGeometry, curveMaterial);
-          polarGroup.add(curve);
-          polarCurve = curve;
-          createPolarSurface(points, type); // Attempt to create surface
-       } else {
-           polarCurve = null; // No valid points
-       }
-
-      return polarCurve; // Return the curve object or null
+      if (points.length > 1) {
+        const curveGeometry = new THREE.BufferGeometry().setFromPoints(points);
+        const curveMaterial = new THREE.LineBasicMaterial({ color: 0xff00ff, linewidth: 3 });
+        const curve = new THREE.Line(curveGeometry, curveMaterial);
+        polarGroup.add(curve);
+        polarCurve = curve;
+        createPolarSurface(points, type);
+      } else {
+        polarCurve = null;
+        console.warn("Not enough valid points to draw polar curve for:", type);
+      }
+      return polarCurve;
     }
 
-    // Create surface for polar curve
     function createPolarSurface(points, type) {
-      // Only attempt for closed curves, not spirals, and needs enough points
       if (type === 'spiral' || points.length < 3) return;
-
       try {
-          // Triangulation approach for complex shapes (using THREE.ShapeUtils.triangulateShape)
-          // This requires the points to form a non-self-intersecting shape boundary.
-          // For curves like roses with multiple petals, direct triangulation is tricky.
-
-          // Let's stick to ShapeGeometry for simpler cases, but be aware of limitations.
-          const shape = new THREE.Shape();
-           // Filter out duplicate close points which can cause issues
-           const uniquePoints = points.filter((p, i, arr) => i === 0 || p.distanceTo(arr[i-1]) > 0.01);
-
-           if(uniquePoints.length < 3) return; // Need at least 3 unique points
-
-          shape.moveTo(uniquePoints[0].x, uniquePoints[0].z); // Use x and z
-          for (let i = 1; i < uniquePoints.length; i++) {
-              shape.lineTo(uniquePoints[i].x, uniquePoints[i].z);
-          }
-           // Close path only if it's not inherently open like some limacons
-           if (type !== 'limaçon' || points[0].distanceTo(points[points.length - 1]) < 0.1) {
-               shape.closePath();
-           }
-
-
-          const geometry = new THREE.ShapeGeometry(shape);
-          // geometry.rotateX(Math.PI / 2); // Rotate to align with the XZ plane view from above (NO! XZ is already ground)
-
-          let color;
-          switch (type) {
-              case 'rose': color = 0xff99cc; break;
-              case 'limaçon': color = 0x66ccff; break;
-              case 'lemniscate': color = 0xadd8e6; break;
-              case 'cardioid': color = 0xff6666; break;
-              default: color = 0x9370db;
-          }
-          const material = new THREE.MeshStandardMaterial({
-              color: color,
-              transparent: true,
-              opacity: 0.6, // Slightly more opaque
-              side: THREE.DoubleSide,
-              depthWrite: false // Try to prevent z-fighting with the line/grid
-          });
-          const mesh = new THREE.Mesh(geometry, material);
-          mesh.userData = { isPolarSurface: true };
-          mesh.position.y = 0.09; // Place slightly below the line but above grid
-          mesh.renderOrder = -1; // Render surface before line
-          polarGroup.add(mesh);
+        const shape = new THREE.Shape();
+        const uniquePoints = points.filter((p, i, arr) => i === 0 || p.distanceTo(arr[i-1]) > 0.01);
+        if(uniquePoints.length < 3) return;
+        shape.moveTo(uniquePoints[0].x, uniquePoints[0].z);
+        for (let i = 1; i < uniquePoints.length; i++) {
+          shape.lineTo(uniquePoints[i].x, uniquePoints[i].z);
+        }
+        const closePath = (type !== 'limaçon' || uniquePoints[0].distanceTo(uniquePoints[uniquePoints.length - 1]) < 0.1);
+        if (closePath) {
+          shape.closePath();
+        }
+        const geometry = new THREE.ShapeGeometry(shape);
+        let color;
+        switch (type) {
+          case 'rose': color = 0xff99cc; break;
+          case 'limaçon': color = 0x66ccff; break;
+          case 'lemniscate': color = 0xadd8e6; break;
+          case 'cardioid': color = 0xff6666; break;
+          default: color = 0x9370db;
+        }
+        const material = new THREE.MeshStandardMaterial({
+          color: color,
+          transparent: true,
+          opacity: 0.6,
+          side: THREE.DoubleSide,
+          depthWrite: false
+        });
+        const mesh = new THREE.Mesh(geometry, material);
+        mesh.userData = { isPolarSurface: true };
+        mesh.position.y = 0.09;
+        mesh.renderOrder = -1;
+        polarGroup.add(mesh);
       } catch (e) {
-          console.warn("Could not create polar surface shape (might be self-intersecting):", type, e);
-          // ShapeGeometry can fail for complex self-intersecting shapes (like multi-petal roses).
-          // A more robust solution involves ear clipping or Delaunay triangulation, which is more complex.
+        console.warn("Could not create polar surface shape:", type, e);
       }
     }
 
-
-    // Create parametric module objects
     function createParametricGroup() {
       parametricGroup = new THREE.Group();
-      parametricGroup.position.set(0, 0.1, 0); // Lift slightly
+      parametricGroup.position.set(0, 0.1, 0);
       scene.add(parametricGroup);
-
-      // Origin marker (optional)
-      // const originGeometry = new THREE.SphereGeometry(0.2, 16, 16);
-      // const originMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
-      // const origin = new THREE.Mesh(originGeometry, originMaterial);
-      // parametricGroup.add(origin);
-
       parametricGroup.visible = false;
-      // Initial path based on defaults
       updateParametricPathVisuals();
     }
 
-    // Update parametric path
     function updateParametricPath(type, a, b) {
       if (parametricPath) {
         parametricGroup.remove(parametricPath);
@@ -1312,746 +1182,653 @@
         parametricPath.material.dispose();
         parametricPath = null;
       }
-      if (parametricObject) { // Also remove old object if path changes
-          parametricGroup.remove(parametricObject);
-          // Dispose geometry/material if needed, but standard geometries might be reused
-          parametricObject = null;
+      if (parametricObject) {
+        parametricGroup.remove(parametricObject);
+        if (parametricObject.geometry) parametricObject.geometry.dispose();
+        if (parametricObject.material) parametricObject.material.dispose();
+        parametricObject = null;
       }
-
       const points = [];
       const segments = 500;
-       // Adjust t range for different curves to show a decent segment
-       let tMax = Math.PI * 2;
-       if (type === 'cycloid') tMax = Math.PI * 4; // Show two arches
-       if (type === 'butterfly') tMax = Math.PI * 12; // Butterfly needs a large range
-       if (type === 'lissajous') tMax = Math.PI * 2; // One cycle is usually enough
-
+      let tMax = Math.PI * 2;
+      if (type === 'cycloid') tMax = Math.PI * 4;
+      if (type === 'butterfly') tMax = Math.PI * 12;
+      if (type === 'lissajous') tMax = Math.PI * 2;
       for (let i = 0; i <= segments; i++) {
-         const t = (i / segments) * tMax;
-         let x=0, z=0; // Use z for the second dimension on the ground plane
-
-         try {
-             switch (type) {
-                 case 'circle':
-                     x = a * Math.cos(t);
-                     z = a * Math.sin(t); // Use parameter 'a' for radius
-                     break;
-                 case 'cycloid': // Path of a point on a rolling circle radius 'a'
-                     x = a * (t - Math.sin(t));
-                     z = a * (1 - Math.cos(t)); // Parametric y maps to Z
-                     break;
-                 case 'lissajous': // Frequencies based on a/b ratio? Let's use fixed 2,3 for now.
-                     // Or use a, b as frequencies? Needs clarification. Let's use them as amplitudes.
-                     const freqX = 2; // Example frequency
-                     const freqY = 3; // Example frequency
-                     x = a * Math.sin(freqX * t); // Use 'a' as X amplitude
-                     z = b * Math.sin(freqY * t); // Use 'b' as Z amplitude
-                     break;
-                 case 'butterfly':
-                     // Use 'a' as overall scale factor
-                     const expr = (Math.exp(Math.cos(t)) - 2 * Math.cos(4 * t) - Math.pow(Math.sin(t / 12), 5));
-                     x = a * Math.sin(t) * expr;
-                     z = a * Math.cos(t) * expr; // Parametric y maps to Z
-                     break;
-                default: throw new Error("Unknown parametric type");
-             }
-             if (!isNaN(x) && !isNaN(z) && isFinite(x) && isFinite(z)) { // Check for valid numbers
-                 points.push(new THREE.Vector3(x, 0.1, z)); // Keep y fixed slightly above ground
-             } else if (points.length > 0) {
-                 // If we get an invalid point, try not to create a huge line jump
-                 // Add the last valid point again to create a break? Or just skip.
-             }
-          } catch (e) {
-              console.error("Error calculating parametric point:", type, t, e);
-              // Skip this point
-          }
-      }
-
-
-      if (points.length > 1) {
-          const curveGeometry = new THREE.BufferGeometry().setFromPoints(points);
-          const curveMaterial = new THREE.LineBasicMaterial({ color: 0x00ffff, linewidth: 3 }); // Thicker line
-          const curve = new THREE.Line(curveGeometry, curveMaterial);
-          parametricGroup.add(curve);
-          parametricPath = curve;
-
-          // Recreate object when path updates
-          let objectGeometry;
-          let objectColor = 0xffaa00; // Default orange
+        const t = (i / segments) * tMax;
+        let x=0, z=0;
+        try {
           switch (type) {
-              case 'circle': objectGeometry = new THREE.SphereGeometry(0.3, 16, 16); objectColor = 0xff0000; break; // Red bird
-              case 'cycloid': objectGeometry = new THREE.BoxGeometry(0.5, 0.5, 0.5); objectColor = 0x0000ff; break; // Blue boat (box)
-              case 'lissajous': objectGeometry = new THREE.TorusKnotGeometry(0.2, 0.05, 50, 8); objectColor = 0xffffff; break; // White drone
-              case 'butterfly': objectGeometry = new THREE.OctahedronGeometry(0.35); objectColor = 0xff00ff; break; // Magenta butterfly
-              default: objectGeometry = new THREE.SphereGeometry(0.3, 16, 16);
+            case 'circle':
+              x = a * Math.cos(t);
+              z = a * Math.sin(t);
+              break;
+            case 'cycloid':
+              x = a * (t - Math.sin(t));
+              z = a * (1 - Math.cos(t));
+              break;
+            case 'lissajous':
+              const freqX = 2;
+              const freqY = 3;
+              x = a * Math.sin(freqX * t);
+              z = b * Math.sin(freqY * t);
+              break;
+            case 'butterfly':
+              const cosT = Math.cos(t);
+              const sinT = Math.sin(t);
+              const expr = (Math.exp(cosT) - 2 * Math.cos(4 * t) - Math.pow(Math.sin(t / 12), 5));
+              x = a * sinT * expr;
+              z = a * cosT * expr;
+              break;
+            default: throw new Error("Unknown parametric type");
           }
-          const objectMaterial = new THREE.MeshStandardMaterial({ color: objectColor, emissive: objectColor, emissiveIntensity: 0.4 }); // Give it slight glow matching color
-          const object = new THREE.Mesh(objectGeometry, objectMaterial);
-          object.castShadow = true;
-          parametricGroup.add(object);
-          parametricObject = object;
-
-          // Store necessary info for animation in userData
-          parametricObject.userData = { type: type, a: a, b: b, tMax: tMax }; // Store tMax needed for looping
-          // Position object at the start
-           appState.paramTime = 0; // Reset time on path update
-           const startPos = getParametricPointForAnim(0, type, a, b); // Use helper
-           if (startPos) parametricObject.position.copy(startPos);
-           else console.warn("Could not get start position for parametric object");
-
-
-      } else {
-          console.warn("Not enough valid points to draw parametric path for:", type);
-          parametricPath = null;
-          parametricObject = null; // No object if no path
+          if (!isNaN(x) && !isNaN(z) && isFinite(x) && isFinite(z)) {
+            points.push(new THREE.Vector3(x, 0.1, z));
+          }
+        } catch (e) {
+          console.error("Error calculating parametric point:", type, t, e);
+        }
       }
-
-      return parametricPath; // Return the path object or null
+      if (points.length > 1) {
+        const curveGeometry = new THREE.BufferGeometry().setFromPoints(points);
+        const curveMaterial = new THREE.LineBasicMaterial({ color: 0x00ffff, linewidth: 3 });
+        const curve = new THREE.Line(curveGeometry, curveMaterial);
+        parametricGroup.add(curve);
+        parametricPath = curve;
+        let objectGeometry;
+        let objectColor = 0xffaa00;
+        switch (type) {
+          case 'circle': objectGeometry = new THREE.SphereGeometry(0.3, 16, 16); objectColor = 0xff0000; break;
+          case 'cycloid': objectGeometry = new THREE.BoxGeometry(0.4, 0.4, 0.6); objectColor = 0x0000ff; break;
+          case 'lissajous': objectGeometry = new THREE.TorusKnotGeometry(0.2, 0.05, 50, 8); objectColor = 0xffffff; break;
+          case 'butterfly': objectGeometry = new THREE.OctahedronGeometry(0.35); objectColor = 0xff00ff; break;
+          default: objectGeometry = new THREE.SphereGeometry(0.3, 16, 16);
+        }
+        const objectMaterial = new THREE.MeshStandardMaterial({ color: objectColor, emissive: objectColor, emissiveIntensity: 0.4 });
+        const object = new THREE.Mesh(objectGeometry, objectMaterial);
+        object.castShadow = true;
+        parametricGroup.add(object);
+        parametricObject = object;
+        parametricObject.userData = { type: type, a: a, b: b, tMax: tMax };
+        appState.paramTime = 0;
+        const startPos = getParametricPointForAnim(0, type, a, b);
+        if (startPos) parametricObject.position.copy(startPos);
+        else console.warn("Could not get start position for parametric object");
+      } else {
+        console.warn("Not enough valid points to draw parametric path for:", type);
+        parametricPath = null;
+        parametricObject = null;
+      }
+      return parametricPath;
     }
 
-    // Helper to get point for animation, including error check
     function getParametricPointForAnim(t, type, a, b) {
-         let x=0, z=0;
-         try {
-             switch (type) {
-                 case 'circle': x = a * Math.cos(t); z = a * Math.sin(t); break;
-                 case 'cycloid': x = a * (t - Math.sin(t)); z = a * (1 - Math.cos(t)); break;
-                 case 'lissajous': x = a * Math.sin(2 * t); z = b * Math.sin(3 * t); break; // Using fixed frequencies again
-                 case 'butterfly':
-                     const expr = (Math.exp(Math.cos(t)) - 2 * Math.cos(4 * t) - Math.pow(Math.sin(t / 12), 5));
-                     x = a * Math.sin(t) * expr; z = a * Math.cos(t) * expr; break;
-                 default: return null; // Unknown type
-             }
-             if (isNaN(x) || isNaN(z) || !isFinite(x) || !isFinite(z)) return null; // Calculation failed or resulted in NaN/Infinity
-             return new THREE.Vector3(x, 0.1, z); // Return the vector (Y=0.1)
-         } catch (e) {
-              console.error("Error calculating parametric point for anim:", type, t, e);
-              return null;
-          }
-     }
+      let x=0, z=0;
+      try {
+        switch (type) {
+          case 'circle': x = a * Math.cos(t); z = a * Math.sin(t); break;
+          case 'cycloid': x = a * (t - Math.sin(t)); z = a * (1 - Math.cos(t)); break;
+          case 'lissajous': x = a * Math.sin(2 * t); z = b * Math.sin(3 * t); break;
+          case 'butterfly':
+            const cosT = Math.cos(t);
+            const sinT = Math.sin(t);
+            const expr = (Math.exp(cosT) - 2 * Math.cos(4 * t) - Math.pow(Math.sin(t / 12), 5));
+            x = a * sinT * expr;
+            z = a * cosT * expr;
+            break;
+          default: return null;
+        }
+        if (isNaN(x) || isNaN(z) || !isFinite(x) || !isFinite(z)) return null;
+        return new THREE.Vector3(x, 0.1, z);
+      } catch (e) {
+        console.error("Error calculating parametric point for anim:", type, t, e);
+        return null;
+      }
+    }
 
-
-    // Animation loop
     function animate() {
       requestAnimationFrame(animate);
       const delta = clock.getDelta();
-
-      // Update controls if they exist
-      if (controls) {
-          controls.update();
+      if (controls && controls.enabled) {
+        controls.update();
       }
-
-      // Parametric animation
       if (appState.animationRunning && parametricObject && parametricObject.visible && parametricObject.userData && parametricObject.userData.type) {
-          const { type, a, b, tMax } = parametricObject.userData; // Get data
-          const speed = parseFloat(document.getElementById('param-speed').value);
-          appState.paramTime += delta * speed;
-
-          // Loop the animation based on the tMax used to generate the curve
-          if (tMax && appState.paramTime > tMax) {
-              appState.paramTime = appState.paramTime % tMax; // Loop back using modulo
+        const { type, a, b, tMax } = parametricObject.userData;
+        const speed = parseFloat(document.getElementById('param-speed').value);
+        appState.paramTime += delta * speed;
+        if (tMax && appState.paramTime > tMax) {
+          appState.paramTime = appState.paramTime % tMax;
+        }
+        const currentPos = getParametricPointForAnim(appState.paramTime, type, a, b);
+        if(currentPos){
+          parametricObject.position.copy(currentPos);
+          const lookAheadTime = appState.paramTime + 0.05 * speed;
+          const nextPos = getParametricPointForAnim(lookAheadTime, type, a, b);
+          if (nextPos && nextPos.distanceTo(currentPos) > 0.01) {
+            const lookTarget = nextPos.clone().setY(parametricObject.position.y);
+            parametricObject.lookAt(lookTarget);
           }
-
-          const currentPos = getParametricPointForAnim(appState.paramTime, type, a, b);
-
-          if(currentPos){
-             parametricObject.position.copy(currentPos);
-
-             // Make the object look ahead (simple tangent calculation)
-             const lookAheadTime = appState.paramTime + 0.05 * speed; // Look slightly ahead (adjust delta for smoothness)
-             const nextPos = getParametricPointForAnim(lookAheadTime, type, a, b);
-             if (nextPos && nextPos.distanceTo(currentPos) > 0.01) { // Only look if next point is different
-                 // Create a target point slightly above the next position for better orientation
-                 const lookTarget = nextPos.clone().setY(parametricObject.position.y);
-                 parametricObject.lookAt(lookTarget);
-             }
-          }
+        }
       }
-
-      // Water animation (simple ripple effect)
-       const waterMaterial = scene.children.find(c => c.geometry instanceof THREE.PlaneGeometry)?.material;
-       if(waterMaterial && waterMaterial.map) {
-           const time = clock.getElapsedTime() * 0.1; // Slow ripple speed
-           waterMaterial.map.offset.x = Math.sin(time * 2) * 0.02;
-           waterMaterial.map.offset.y = Math.cos(time) * 0.02;
-           waterMaterial.needsUpdate = true;
-       }
-
-
+      const waterMaterial = scene.children.find(c => c.geometry instanceof THREE.PlaneGeometry)?.material;
+      if(waterMaterial && waterMaterial.map) {
+        const time = clock.getElapsedTime() * 0.1;
+        waterMaterial.map.offset.x = Math.sin(time * 2) * 0.02;
+        waterMaterial.map.offset.y = Math.cos(time) * 0.02;
+        waterMaterial.needsUpdate = true;
+      }
       renderer.render(scene, camera);
     }
 
-    // --- Event Listeners Setup ---
     function initEventListeners() {
-      // Tab switching
       document.querySelectorAll('.tab').forEach(tab => {
         tab.addEventListener('click', () => {
           const module = tab.getAttribute('data-module');
-          handleTabClick(module); // Use a handler function
+          handleTabClick(module);
         });
       });
-
-      // Module buttons in overview
       document.querySelectorAll('.module-btn').forEach(btn => {
         btn.addEventListener('click', () => {
           const module = btn.getAttribute('data-module');
-          handleTabClick(module); // Also use handler
+          handleTabClick(module);
         });
       });
-
-      // Modals
       startMissionBtn.addEventListener('click', () => {
-        welcomeModal.style.display = 'none';
-        // Start with overview focused
+        gsap.to(welcomeModal, {duration: 0.3, opacity: 0, y: 30, ease: "power1.in", onComplete: () => welcomeModal.style.display = 'none' });
         centerMap();
       });
       closeInfoModalBtn.addEventListener('click', () => infoModal.style.display = 'none');
       closeHelpModalBtn.addEventListener('click', () => helpModal.style.display = 'none');
-
-
-      // Header buttons
       document.getElementById('return-overview').addEventListener('click', () => {
         handleTabClick('overview');
       });
-      document.getElementById('show-help-header').addEventListener('click', showActionHelp); // Show action help
-
-      // Triangle module events
-      document.getElementById('triangle-select').addEventListener('change', updateTriangleProblem); // Update problem when region changes
-      document.getElementById('triangle-problem-type').addEventListener('change', setupTriangleInputs); // Setup inputs when type changes
+      document.getElementById('show-help-header').addEventListener('click', showActionHelp);
+      document.getElementById('triangle-select').addEventListener('change', updateTriangleProblem);
+      document.getElementById('triangle-problem-type').addEventListener('change', setupTriangleInputs);
       document.getElementById('solve-triangle').addEventListener('click', solveTriangle);
       document.getElementById('triangle-hint-btn').addEventListener('click', toggleHintVisibility);
       document.getElementById('complete-triangulation').addEventListener('click', () => completeTask('triangulation'));
-
-      // Vector module events
-      // Update vectors live on input change
       ['vector1-x', 'vector1-y', 'vector1-z', 'vector2-x', 'vector2-y', 'vector2-z'].forEach(id => {
-          document.getElementById(id).addEventListener('input', updateVectors);
+        document.getElementById(id).addEventListener('input', updateVectors);
       });
-      document.getElementById('calculate-vector').addEventListener('click', updateVectors); // Keep button too
+      document.getElementById('calculate-vector').addEventListener('click', updateVectors);
       document.getElementById('calculate-dot-product').addEventListener('click', calculateDotProduct);
       document.getElementById('vector-hint-btn').addEventListener('click', toggleHintVisibility);
       document.getElementById('complete-vectors').addEventListener('click', () => completeTask('vectors'));
-
-      // Polar module events - Update curve live on slider/select change
       document.getElementById('polar-a').addEventListener('input', () => { updatePolarParams(); updatePolarCurve(); });
       document.getElementById('polar-n').addEventListener('input', () => { updatePolarParams(); updatePolarCurve(); });
       document.getElementById('polar-type').addEventListener('change', () => { updatePolarParams(); updatePolarCurve(); });
-      // document.getElementById('update-polar').addEventListener('click', updatePolarCurve); // Removed button
       document.getElementById('convert-polar').addEventListener('click', convertPolar);
       document.getElementById('polar-hint-btn').addEventListener('click', toggleHintVisibility);
       document.getElementById('complete-polar').addEventListener('click', () => completeTask('polar'));
-
-      // Parametric module events - Update path live on slider/select change
       document.getElementById('param-speed').addEventListener('input', updateParametricSpeed);
       document.getElementById('param-a').addEventListener('input', () => { updateParametricParams(); updateParametricPathVisuals(); });
       document.getElementById('param-b').addEventListener('input', () => { updateParametricParams(); updateParametricPathVisuals(); });
       document.getElementById('parametric-type').addEventListener('change', () => { updateParametricParams(); updateParametricPathVisuals(); });
-      // document.getElementById('update-parametric').addEventListener('click', updateParametricPathVisuals); // Removed button
       document.getElementById('toggle-animation').addEventListener('click', toggleAnimation);
       document.getElementById('parametric-hint-btn').addEventListener('click', toggleHintVisibility);
       document.getElementById('complete-parametric').addEventListener('click', () => completeTask('parametric'));
-
     }
 
-    // Toggles hint visibility for the button's parent module
     function toggleHintVisibility(event) {
-        const button = event.target;
-        const hint = button.nextElementSibling; // Assumes hint div is immediately after button
-        if (hint && hint.classList.contains('hint')) {
-            hint.style.display = (hint.style.display === 'none' || hint.style.display === '') ? 'block' : 'none';
-        }
+      const button = event.target;
+      const hint = button.nextElementSibling;
+      if (hint && hint.classList.contains('hint')) {
+        const isHidden = hint.style.display === 'none' || hint.style.display === '';
+        gsap.to(hint, { duration: 0.3, height: isHidden ? 'auto' : 0, opacity: isHidden ? 1 : 0, onStart: () => { if(isHidden) hint.style.display = 'block'; }, onComplete: () => { if(!isHidden) hint.style.display = 'none'; } });
+      }
     }
 
-
-    // Handle tab clicks (including module buttons)
     function handleTabClick(module) {
-        // Deactivate all tabs first
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        // Activate the clicked tab
-        const clickedTab = document.querySelector(`.tab[data-module="${module}"]`);
-        if (clickedTab) clickedTab.classList.add('active');
-
-        // Handle special tabs
-        if (module === 'center-map') {
-            centerMap();
-            // Optionally reactivate the previous content module tab visually
-            const prevContentTab = document.querySelector(`.tab[data-module="${appState.currentModule}"]`);
-            if(prevContentTab) prevContentTab.classList.add('active');
-            return; // Don't switch content panel
-        }
-        if (module === 'zoom-in') {
-            zoomInOnModule();
-            const prevContentTab = document.querySelector(`.tab[data-module="${appState.currentModule}"]`);
-            if(prevContentTab) prevContentTab.classList.add('active');
-            return; // Don't switch content panel
-        }
-        if (module === 'info') {
-            showInfo();
-            const prevContentTab = document.querySelector(`.tab[data-module="${appState.currentModule}"]`);
-             if(prevContentTab) prevContentTab.classList.add('active');
-            return; // Don't switch content panel
-        }
-        if (module === 'help') {
-            showActionHelp();
-            const prevContentTab = document.querySelector(`.tab[data-module="${appState.currentModule}"]`);
-             if(prevContentTab) prevContentTab.classList.add('active');
-            return; // Don't switch content panel
-        }
-
-        // If it's a standard content module, switch the view
+      const previousContentModule = appState.currentModule;
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      const clickedTab = document.querySelector(`.tab[data-module="${module}"]`);
+      if (clickedTab) clickedTab.classList.add('active');
+      if (module === 'center-map') {
+        centerMap();
+        const prevContentTab = document.querySelector(`.tab[data-module="${previousContentModule}"]`);
+        if(prevContentTab) prevContentTab.classList.add('active');
+        return;
+      }
+      if (module === 'zoom-in') {
+        zoomInOnModule();
+        const prevContentTab = document.querySelector(`.tab[data-module="${previousContentModule}"]`);
+        if(prevContentTab) prevContentTab.classList.add('active');
+        return;
+      }
+      if (module === 'info') {
+        showInfo();
+        const prevContentTab = document.querySelector(`.tab[data-module="${previousContentModule}"]`);
+        if(prevContentTab) prevContentTab.classList.add('active');
+        return;
+      }
+      if (module === 'help') {
+        showActionHelp();
+        const prevContentTab = document.querySelector(`.tab[data-module="${previousContentModule}"]`);
+        if(prevContentTab) prevContentTab.classList.add('active');
+        return;
+      }
+      if (contentModules.includes(module)) {
         switchModule(module);
+      } else {
+        console.warn("Unhandled tab module:", module);
+        const prevContentTab = document.querySelector(`.tab[data-module="${previousContentModule}"]`);
+        if (clickedTab) clickedTab.classList.remove('active');
+        if (prevContentTab) prevContentTab.classList.add('active');
+      }
     }
 
-
-    // Switch between content modules
     function switchModule(module) {
-      if (!contentModules.includes(module)) return; // Only switch for content modules
-
-      appState.currentModule = module; // Update state
-
-      // Hide all content containers
-      contentModules.forEach(m => {
-        const element = document.getElementById(m);
-        if(element) element.classList.remove('active');
-      });
-      // Show the selected one
-       const activeElement = document.getElementById(module);
-       if(activeElement) activeElement.classList.add('active');
-
-
-      // Toggle visibility of 3D groups
+      if (!contentModules.includes(module)) return;
+      if (module === appState.currentModule) return;
+      const previousModule = appState.currentModule;
+      appState.currentModule = module;
+      const previousElement = document.getElementById(previousModule);
+      const activeElement = document.getElementById(module);
+      if (previousElement) {
+        gsap.to(previousElement, { duration: 0.2, opacity: 0, onComplete: () => {
+          previousElement.classList.remove('active');
+          if (activeElement) {
+            activeElement.style.opacity = 0;
+            activeElement.classList.add('active');
+            gsap.to(activeElement, { duration: 0.3, opacity: 1 });
+          }
+        }});
+      } else if (activeElement) {
+        activeElement.style.opacity = 0;
+        activeElement.classList.add('active');
+        gsap.to(activeElement, { duration: 0.3, opacity: 1 });
+      }
       triangleGroup.visible = (module === 'triangulation');
       vectorGroup.visible = (module === 'vectors');
       polarGroup.visible = (module === 'polar');
       parametricGroup.visible = (module === 'parametric');
-
-       // Hide all hints when switching modules
-       document.querySelectorAll('.hint').forEach(hint => hint.style.display = 'none');
-
-       // Focus camera on the relevant group, update UI as needed
-       focusCameraOnModule(module);
-
-      // Trigger initial updates for the selected module
-       switch(module) {
-           case 'triangulation':
-                updateTriangleProblem(); // Update inputs/info for default/selected region
-               break;
-           case 'vectors':
-                updateVectors(); // Refresh vector display
-               break;
-           case 'polar':
-                updatePolarParams(); // Refresh params display
-                updatePolarCurve(); // Redraw curve if needed
-               break;
-           case 'parametric':
-                updateParametricParams(); // Refresh params display
-                updateParametricPathVisuals(); // Redraw path and reset object
-               break;
-            case 'overview':
-                updateProgress(); // Ensure progress display is current
-                break;
-       }
+      document.querySelectorAll('.hint').forEach(hint => {
+        hint.style.display = 'none';
+        hint.style.height = '';
+        hint.style.opacity = '';
+      });
+      focusCameraOnModule(module);
+      switch(module) {
+        case 'triangulation':
+          updateTriangleProblem();
+          break;
+        case 'vectors':
+          updateVectors();
+          break;
+        case 'polar':
+          updatePolarParams();
+          updatePolarCurve();
+          break;
+        case 'parametric':
+          updateParametricParams();
+          updateParametricPathVisuals();
+          break;
+        case 'overview':
+          updateProgress();
+          break;
+      }
     }
 
-    // --- Camera Control Functions ---
     function centerMap() {
-        console.log("Centering map...");
-         if (!controls) return;
-         controls.target.set(0, 0, 0);
-         // Animate camera position back to default
-         gsap.to(camera.position, {
-             duration: 0.8,
-             x: 0,
-             y: 25,
-             z: 40,
-             ease: "power2.out",
-             onUpdate: () => camera.lookAt(controls.target) // Keep looking at target during animation
-         });
-         gsap.to(controls.target, { // Also ensure target is centered
-             duration: 0.8,
-             x: 0,
-             y: 0,
-             z: 0,
-             ease: "power2.out"
-         });
+      console.log("Centering map...");
+      if (!controls || !gsap) return;
+      controls.target.set(0, 0, 0);
+      gsap.to(camera.position, {
+        duration: 0.8,
+        x: 0,
+        y: 25,
+        z: 40,
+        ease: "power2.out",
+        onUpdate: () => camera.lookAt(controls.target)
+      });
+      gsap.to(controls.target, {
+        duration: 0.8,
+        x: 0,
+        y: 0,
+        z: 0,
+        ease: "power2.out"
+      });
     }
 
     function zoomInOnModule() {
-        console.log("Zooming in on module:", appState.currentModule);
-         if (!controls) return;
-        let targetPosition = new THREE.Vector3(0, 0, 0); // Default target
-        let zoomDistance = 15; // Default zoom distance
-
-        switch (appState.currentModule) {
-            case 'triangulation':
-                 const selectedTriangleIndex = parseInt(document.getElementById('triangle-select').value) - 1;
-                 const targetTriangle = triangleRegions[selectedTriangleIndex];
-                 if (targetTriangle) {
-                     // Calculate centroid of the triangle mesh (relative to its group)
-                     targetTriangle.geometry.computeBoundingSphere();
-                     const center = targetTriangle.geometry.boundingSphere.center.clone();
-                     targetPosition = targetTriangle.localToWorld(center); // Get world position
-                     zoomDistance = 10; // Closer zoom for triangles
-                 }
-                break;
-            case 'vectors':
-                targetPosition = vectorGroup.position.clone(); // Target the vector origin
-                zoomDistance = 10;
-                break;
-            case 'polar':
-                targetPosition = polarGroup.position.clone(); // Target polar origin/center
-                zoomDistance = 15; // Polar curves can be larger
-                 // Adjust camera angle for better polar view
-                 gsap.to(camera.position, {
-                     duration: 0.8,
-                     x: targetPosition.x,
-                     y: targetPosition.y + zoomDistance, // More top-down
-                     z: targetPosition.z + 1, // Slight offset
-                     ease: "power2.out",
-                      onUpdate: () => camera.lookAt(controls.target)
-                 });
-                  gsap.to(controls.target, { duration: 0.8, x: targetPosition.x, y: targetPosition.y, z: targetPosition.z, ease: "power2.out" });
-                 return; // Use specific animation for polar
-
-            case 'parametric':
-                targetPosition = parametricGroup.position.clone(); // Target parametric origin
-                if (parametricObject) { // Or target the moving object
-                    targetPosition = parametricObject.position.clone();
-                }
-                zoomDistance = 18; // Parametric can be spread out
-                break;
-            default: // Overview or others
-                targetPosition = island.position.clone(); // Target center of island
-                zoomDistance = 25;
-        }
-
-         // Animate camera towards the target position
-         // Calculate a good camera position based on target and distance
-         const direction = new THREE.Vector3().subVectors(camera.position, controls.target).normalize();
-         const newCamPos = new THREE.Vector3().addVectors(targetPosition, direction.multiplyScalar(zoomDistance));
-
-         gsap.to(camera.position, {
-             duration: 0.8,
-             x: newCamPos.x,
-             y: Math.max(newCamPos.y, 5), // Don't go too low
-             z: newCamPos.z,
-             ease: "power2.out",
-             onUpdate: () => camera.lookAt(controls.target)
-         });
-         gsap.to(controls.target, { // Animate target smoothly
-             duration: 0.8,
-             x: targetPosition.x,
-             y: targetPosition.y,
-             z: targetPosition.z,
-             ease: "power2.out"
-         });
+      console.log("Zooming in on module:", appState.currentModule);
+      if (!controls || !gsap) return;
+      let targetPosition = new THREE.Vector3(0, 0, 0);
+      let zoomDistance = 15;
+      let lookOffset = new THREE.Vector3(0, 0, 0);
+      switch (appState.currentModule) {
+        case 'triangulation':
+          const selectedTriangleIndex = parseInt(document.getElementById('triangle-select').value) - 1;
+          const targetTriangle = triangleRegions[selectedTriangleIndex];
+          if (targetTriangle) {
+            if(!targetTriangle.geometry.boundingSphere) targetTriangle.geometry.computeBoundingSphere();
+            const center = targetTriangle.geometry.boundingSphere.center.clone();
+            targetPosition = targetTriangle.localToWorld(center);
+            zoomDistance = 10;
+          }
+          break;
+        case 'vectors':
+          targetPosition = vectorGroup.position.clone();
+          zoomDistance = 10;
+          break;
+        case 'polar':
+          targetPosition = polarGroup.position.clone();
+          zoomDistance = 15;
+          gsap.to(camera.position, {
+            duration: 0.8,
+            x: targetPosition.x,
+            y: targetPosition.y + zoomDistance,
+            z: targetPosition.z + 1,
+            ease: "power2.out",
+            onUpdate: () => camera.lookAt(controls.target)
+          });
+          gsap.to(controls.target, { duration: 0.8, x: targetPosition.x, y: targetPosition.y, z: targetPosition.z, ease: "power2.out" });
+          return;
+        case 'parametric':
+          targetPosition = parametricGroup.position.clone();
+          if (parametricObject && parametricObject.visible) {
+            targetPosition = parametricObject.position.clone();
+          }
+          zoomDistance = 18;
+          break;
+        default:
+          targetPosition = island.position.clone();
+          zoomDistance = 25;
+      }
+      const direction = new THREE.Vector3().subVectors(camera.position, controls.target).normalize();
+      if (direction.lengthSq() < 0.0001) direction.set(0, 0.5, 0.5).normalize();
+      const newCamPos = new THREE.Vector3().addVectors(targetPosition, direction.multiplyScalar(zoomDistance));
+      gsap.to(camera.position, {
+        duration: 0.8,
+        x: newCamPos.x,
+        y: Math.max(newCamPos.y, 5),
+        z: newCamPos.z,
+        ease: "power2.out",
+        onUpdate: () => camera.lookAt(controls.target)
+      });
+      gsap.to(controls.target, {
+        duration: 0.8,
+        x: targetPosition.x + lookOffset.x,
+        y: targetPosition.y + lookOffset.y,
+        z: targetPosition.z + lookOffset.z,
+        ease: "power2.out"
+      });
     }
 
-    // Focus camera without the dramatic zoom-in effect (used on module switch)
     function focusCameraOnModule(module) {
-        if (!controls) return;
-        let targetPosition = new THREE.Vector3(0, 0, 0);
-        let idealDistance = 25; // Default distance
-
-        switch (module) {
-            case 'triangulation':
-                const selectedTriangleIndex = parseInt(document.getElementById('triangle-select').value) - 1;
-                const targetTriangle = triangleRegions[selectedTriangleIndex];
-                if (targetTriangle) {
-                    targetTriangle.geometry.computeBoundingSphere();
-                    targetPosition = targetTriangle.localToWorld(targetTriangle.geometry.boundingSphere.center.clone());
-                    idealDistance = 12;
-                }
-                break;
-            case 'vectors':
-                targetPosition = vectorGroup.getWorldPosition(new THREE.Vector3());
-                idealDistance = 12;
-                break;
-            case 'polar':
-                targetPosition = polarGroup.getWorldPosition(new THREE.Vector3());
-                idealDistance = 20; // Need more space for polar
-                 // Set a more top-down view for polar
-                 gsap.to(camera.position, {
-                     duration: 0.6, x: targetPosition.x, y: targetPosition.y + idealDistance, z: targetPosition.z + 1,
-                     ease: "power1.out", onUpdate: () => camera.lookAt(controls.target) });
-                 gsap.to(controls.target, { duration: 0.6, x: targetPosition.x, y: targetPosition.y, z: targetPosition.z, ease: "power1.out" });
-                 return; // Special handling for polar
-            case 'parametric':
-                targetPosition = parametricGroup.getWorldPosition(new THREE.Vector3());
-                idealDistance = 22; // Need space for paths
-                break;
-            default: // Overview
-                targetPosition.set(0,0,0);
-                idealDistance = 35;
-        }
-
-        // Gently move target and camera
-         const direction = new THREE.Vector3().subVectors(camera.position, controls.target).normalize();
-         const newCamPos = new THREE.Vector3().addVectors(targetPosition, direction.multiplyScalar(idealDistance));
-
-         gsap.to(controls.target, { duration: 0.6, x: targetPosition.x, y: targetPosition.y, z: targetPosition.z, ease: "power1.out"});
-         gsap.to(camera.position, { duration: 0.6, x: newCamPos.x, y: Math.max(newCamPos.y, 5), z: newCamPos.z, ease: "power1.out", onUpdate: () => camera.lookAt(controls.target) });
-
+      if (!controls || !gsap) return;
+      let targetPosition = new THREE.Vector3(0, 0, 0);
+      let idealDistance = 25;
+      switch (module) {
+        case 'triangulation':
+          const selectedTriangleIndex = parseInt(document.getElementById('triangle-select').value) - 1;
+          const targetTriangle = triangleRegions[selectedTriangleIndex];
+          if (targetTriangle) {
+            if(!targetTriangle.geometry.boundingSphere) targetTriangle.geometry.computeBoundingSphere();
+            const center = targetTriangle.geometry.boundingSphere.center.clone();
+            targetPosition = targetTriangle.localToWorld(center);
+            idealDistance = 12;
+          }
+          break;
+        case 'vectors':
+          targetPosition = vectorGroup.getWorldPosition(new THREE.Vector3());
+          idealDistance = 12;
+          break;
+        case 'polar':
+          targetPosition = polarGroup.getWorldPosition(new THREE.Vector3());
+          idealDistance = 20;
+          gsap.to(camera.position, {
+            duration: 0.6, x: targetPosition.x, y: targetPosition.y + idealDistance, z: targetPosition.z + 1,
+            ease: "power1.out", overwrite: true, onUpdate: () => camera.lookAt(controls.target)
+          });
+          gsap.to(controls.target, { duration: 0.6, x: targetPosition.x, y: targetPosition.y, z: targetPosition.z, ease: "power1.out", overwrite: true });
+          return;
+        case 'parametric':
+          targetPosition = parametricGroup.getWorldPosition(new THREE.Vector3());
+          idealDistance = 22;
+          break;
+        default:
+          targetPosition.set(0,0,0);
+          idealDistance = 35;
+      }
+      const direction = new THREE.Vector3().subVectors(camera.position, controls.target).normalize();
+      if (direction.lengthSq() < 0.0001) direction.set(0, 0.5, 0.5).normalize();
+      const newCamPos = new THREE.Vector3().addVectors(targetPosition, direction.multiplyScalar(idealDistance));
+      gsap.to(controls.target, { duration: 0.6, x: targetPosition.x, y: targetPosition.y, z: targetPosition.z, ease: "power1.out", overwrite: true});
+      gsap.to(camera.position, { duration: 0.6, x: newCamPos.x, y: Math.max(newCamPos.y, 5), z: newCamPos.z, ease: "power1.out", overwrite: true, onUpdate: () => camera.lookAt(controls.target) });
     }
 
-    // --- Modal Functions ---
     function showInfo() {
-        infoModal.style.display = 'block';
+      gsap.from(infoModal, { duration: 0.4, opacity: 0, scale: 0.9, ease: "back.out(1.7)", onStart: () => infoModal.style.display = 'block'});
     }
 
     function showActionHelp() {
-        helpModal.style.display = 'block';
+      gsap.from(helpModal, { duration: 0.4, opacity: 0, scale: 0.9, ease: "back.out(1.7)", onStart: () => helpModal.style.display = 'block'});
     }
 
-    // --- Triangle Module Functions ---
     function updateTriangleProblem() {
       const select = document.getElementById('triangle-select');
       const regionIndex = parseInt(select.value) - 1;
       const data = triangleData[regionIndex];
       if (!data) return;
-
-      // Update info display
       const infoDiv = document.getElementById('triangle-info');
       infoDiv.innerHTML = `
         <strong>${data.name}</strong><br>
         Default problem: ${data.defaultProblem}<br>
-        Initial sides: ${data.sides.map((s, i) => s > 0 ? `${String.fromCharCode(97 + i)}=${s}` : '').filter(Boolean).join(', ') || 'None'}<br>
-        Initial angles: ${data.angles.map((a, i) => a > 0 ? `${String.fromCharCode(65 + i)}=${a}°` : '').filter(Boolean).join(', ') || 'None'}
+        <small>Initial knowns: Sides=${data.sides.map((s, i) => s > 0 ? `${String.fromCharCode(97 + i)}=${s}` : '').filter(Boolean).join(', ') || 'N/A'}, Angles=${data.angles.map((a, i) => a > 0 ? `${String.fromCharCode(65 + i)}=${a}°` : '').filter(Boolean).join(', ') || 'N/A'}</small>
       `;
-
-      // Highlight the selected mesh
       triangleRegions.forEach((mesh, index) => {
-        mesh.material.emissive.setHex(index === regionIndex ? 0x555555 : 0x000000); // Use emissive for highlight
+        mesh.material.emissive.setHex(index === regionIndex ? 0x555555 : 0x000000);
         mesh.material.needsUpdate = true;
       });
-
-      // Set the problem type dropdown to the region's default
       document.getElementById('triangle-problem-type').value = data.defaultProblem;
-
-      // Setup the input fields based on the (now selected) problem type
       setupTriangleInputs();
-
-      // Focus camera on the selected triangle
-       if(appState.currentModule === 'triangulation') {
-           focusCameraOnModule('triangulation');
-       }
+      document.getElementById('triangle-result').innerHTML = '<p>Enter known values and click Calculate.</p>';
+      const triangleMesh = triangleRegions[regionIndex];
+      if(triangleMesh) {
+        while(triangleMesh.children.length > 0) {
+          const child = triangleMesh.children[0];
+          if (child.material) {
+            if(child.material.map) child.material.map.dispose();
+            child.material.dispose();
+          }
+          if(child.geometry) child.geometry.dispose();
+          triangleMesh.remove(child);
+        }
+      }
+      if(appState.currentModule === 'triangulation') {
+        focusCameraOnModule('triangulation');
+      }
     }
 
     function setupTriangleInputs() {
       const problemType = document.getElementById('triangle-problem-type').value;
       const inputsDiv = document.getElementById('triangle-inputs');
       const regionIndex = parseInt(document.getElementById('triangle-select').value) - 1;
-      const data = triangleData[regionIndex] || { sides: [], angles: [] }; // Fallback
+      const data = triangleData[regionIndex] || { sides: [0,0,0], angles: [0,0,0] };
       let html = '';
-
-      // Helper to create input fields, using initial data if available for the selected type
-      const createInput = (type, label, id, value = '', step = 0.1, min = 0, max = '') => `
+      const createInput = (type, label, id, value = '', step = 0.1, min = 0, max = '') => {
+        let displayValue = '';
+        const defaultProblem = triangleData[regionIndex]?.defaultProblem;
+        if (problemType === defaultProblem) {
+          if (id === 'triangle-side-a' && data.sides[0] > 0) displayValue = data.sides[0];
+          else if (id === 'triangle-side-b' && data.sides[1] > 0) displayValue = data.sides[1];
+          else if (id === 'triangle-side-c' && data.sides[2] > 0) displayValue = data.sides[2];
+          else if (id === 'triangle-angle-a' && data.angles[0] > 0) displayValue = data.angles[0];
+          else if (id === 'triangle-angle-b' && data.angles[1] > 0) displayValue = data.angles[1];
+          else if (id === 'triangle-angle-c' && data.angles[2] > 0) displayValue = data.angles[2];
+          else displayValue = value;
+        } else {
+          displayValue = value;
+        }
+        return `
             <div class="input-group">
-              <label>${label}:</label>
-              <input type="${type}" id="${id}" step="${step}" min="${min}" ${max ? `max="${max}"` : ''} value="${value}">
+              <label for="${id}">${label}:</label>
+              <input type="${type}" id="${id}" step="${step}" min="${min}" ${max ? `max="${max}"` : ''} placeholder="${value || 'Enter value'}" value="${displayValue}">
             </div>`;
-
+      }
       switch (problemType) {
         case 'SSS':
-          html = createInput('number', 'Side a', 'triangle-side-a', data.sides[0] || '') +
-                 createInput('number', 'Side b', 'triangle-side-b', data.sides[1] || '') +
-                 createInput('number', 'Side c', 'triangle-side-c', data.sides[2] || '');
+          html = createInput('number', 'Side a', 'triangle-side-a', 'e.g., 12') +
+                 createInput('number', 'Side b', 'triangle-side-b', 'e.g., 8') +
+                 createInput('number', 'Side c', 'triangle-side-c', 'e.g., 10');
           break;
-        case 'SAS': // Assume sides a, b and angle C are the inputs for SAS
-          html = createInput('number', 'Side a', 'triangle-side-a', data.sides[0] || '') +
-                 createInput('number', 'Angle C (°)', 'triangle-angle-c', data.angles[2] || '', 1, 0, 179) +
-                 createInput('number', 'Side b', 'triangle-side-b', data.sides[1] || '');
+        case 'SAS':
+          html = createInput('number', 'Side a', 'triangle-side-a', 'e.g., 9') +
+                 createInput('number', 'Angle C (°)', 'triangle-angle-c', 'e.g., 45', 1, 0.1, 179.9) +
+                 createInput('number', 'Side b', 'triangle-side-b', 'e.g., 11');
           break;
-        case 'ASA': // Assume angles A, B and side c are the inputs for ASA
-          html = createInput('number', 'Angle A (°)', 'triangle-angle-a', data.angles[0] || '', 1, 0, 179) +
-                 createInput('number', 'Side c (between A, B)', 'triangle-side-c', data.sides[2] || '') +
-                 createInput('number', 'Angle B (°)', 'triangle-angle-b', data.angles[1] || '', 1, 0, 179);
+        case 'ASA':
+          html = createInput('number', 'Angle A (°)', 'triangle-angle-a', 'e.g., 50', 1, 0.1, 179.8) +
+                 createInput('number', 'Side c (between A, B)', 'triangle-side-c', 'e.g., 7') +
+                 createInput('number', 'Angle B (°)', 'triangle-angle-b', 'e.g., 60', 1, 0.1, 179.8);
           break;
-        case 'AAS': // Assume angles A, B and side a (opposite A) are inputs for AAS
-          html = createInput('number', 'Angle A (°)', 'triangle-angle-a', data.angles[0] || '', 1, 0, 179) +
-                 createInput('number', 'Angle B (°)', 'triangle-angle-b', data.angles[1] || '', 1, 0, 179) +
-                 createInput('number', 'Side a (opposite A)', 'triangle-side-a', data.sides[0] || '');
+        case 'AAS':
+          html = createInput('number', 'Angle A (°)', 'triangle-angle-a', 'e.g., 50', 1, 0.1, 179.8) +
+                 createInput('number', 'Angle B (°)', 'triangle-angle-b', 'e.g., 60', 1, 0.1, 179.8) +
+                 createInput('number', 'Side a (opposite A)', 'triangle-side-a', 'e.g., 7');
           break;
       }
       inputsDiv.innerHTML = html;
-      // Clear previous results when inputs change
       document.getElementById('triangle-result').innerHTML = '<p>Enter known values and click Calculate.</p>';
     }
 
-
-    // Using Math.js for calculations where possible
     function solveTriangle() {
       const problemType = document.getElementById('triangle-problem-type').value;
       const resultDiv = document.getElementById('triangle-result');
-      const { sin, cos, asin, acos, sqrt, PI } = Math; // Use built-in Math
+      const { sin, cos, asin, acos, sqrt, PI } = Math;
       const toRad = angle => angle * PI / 180;
       const toDeg = rad => rad * 180 / PI;
-
-      let a=NaN, b=NaN, c=NaN, A=NaN, B=NaN, C=NaN; // Use uppercase for angles in degrees
+      let a=NaN, b=NaN, c=NaN, A=NaN, B=NaN, C=NaN;
       let area = NaN;
-      let errorMsg = '';
-
+      const TOLERANCE = 1e-9;
+      resultDiv.classList.remove('error');
+      const existingCompletion = resultDiv.querySelector('.completion-message');
+      if (existingCompletion) existingCompletion.remove();
       try {
-          // --- Get Inputs based on type ---
-           if (problemType === 'SSS') {
-               a = parseFloat(document.getElementById('triangle-side-a').value);
-               b = parseFloat(document.getElementById('triangle-side-b').value);
-               c = parseFloat(document.getElementById('triangle-side-c').value);
-               if (isNaN(a) || isNaN(b) || isNaN(c) || a <= 0 || b <= 0 || c <= 0) throw new Error("Valid positive side lengths required.");
-               if (a + b <= c + 1e-9 || a + c <= b + 1e-9 || b + c <= a + 1e-9) throw new Error("Triangle inequality violated (sides cannot form a triangle)."); // Add tolerance
-
-               // Law of Cosines to find angles
-               let cosA = (b * b + c * c - a * a) / (2 * b * c);
-               let cosB = (a * a + c * c - b * b) / (2 * a * c);
-               // Clamp values to [-1, 1] due to potential floating point errors
-               cosA = Math.max(-1, Math.min(1, cosA));
-               cosB = Math.max(-1, Math.min(1, cosB));
-
-               A = toDeg(acos(cosA));
-               B = toDeg(acos(cosB));
-               C = 180 - A - B; // Calculate third angle
-               if (isNaN(A) || isNaN(B) || isNaN(C) || C < 1e-6) throw new Error("Could not calculate valid angles.");
-
-           } else if (problemType === 'SAS') {
-               a = parseFloat(document.getElementById('triangle-side-a').value);
-               C = parseFloat(document.getElementById('triangle-angle-c').value); // Angle C
-               b = parseFloat(document.getElementById('triangle-side-b').value);
-               if (isNaN(a) || isNaN(b) || isNaN(C) || a <= 0 || b <= 0 || C <= 0 || C >= 180) throw new Error("Valid positive sides and angle (0 < C < 180) required.");
-               const Crad = toRad(C);
-               // Law of Cosines for side c
-               c = sqrt(a * a + b * b - 2 * a * b * cos(Crad));
-                if (isNaN(c)) throw new Error("Could not calculate side c.");
-               // Law of Cosines for angle A (more stable than Law of Sines for ambiguity)
-                let cosA = (b * b + c * c - a * a) / (2 * b * c);
-                cosA = Math.max(-1, Math.min(1, cosA));
-                A = toDeg(acos(cosA));
-               B = 180 - A - C;
-                if (isNaN(A) || isNaN(B) || B < 1e-6) throw new Error("Could not calculate valid remaining angles.");
-
-
-           } else if (problemType === 'ASA') {
-               A = parseFloat(document.getElementById('triangle-angle-a').value);
-               c = parseFloat(document.getElementById('triangle-side-c').value);
-               B = parseFloat(document.getElementById('triangle-angle-b').value);
-               if (isNaN(A) || isNaN(B) || isNaN(c) || A <= 0 || B <= 0 || c <= 0 || A + B >= 180) throw new Error("Valid positive angles and side required (A+B < 180).");
-               C = 180 - A - B;
-               const Arad = toRad(A);
-               const Brad = toRad(B);
-               const Crad = toRad(C);
-               // Law of Sines
-               a = c * sin(Arad) / sin(Crad);
-               b = c * sin(Brad) / sin(Crad);
-               if (isNaN(a) || isNaN(b) || isNaN(C) || a < 1e-9 || b < 1e-9) throw new Error("Could not calculate valid remaining sides.");
-
-
-           } else if (problemType === 'AAS') {
-               A = parseFloat(document.getElementById('triangle-angle-a').value);
-               B = parseFloat(document.getElementById('triangle-angle-b').value);
-               a = parseFloat(document.getElementById('triangle-side-a').value); // Assume side 'a' is known (opposite A)
-               if (isNaN(A) || isNaN(B) || isNaN(a) || A <= 0 || B <= 0 || a <= 0 || A + B >= 180) throw new Error("Valid positive angles and side required (A+B < 180).");
-               C = 180 - A - B;
-               const Arad = toRad(A);
-               const Brad = toRad(B);
-               const Crad = toRad(C);
-               // Law of Sines
-               b = a * sin(Brad) / sin(Arad);
-               c = a * sin(Crad) / sin(Arad);
-               if (isNaN(b) || isNaN(c) || isNaN(C) || b < 1e-9 || c < 1e-9) throw new Error("Could not calculate valid remaining sides.");
-
-
-           } else {
-               throw new Error("Unknown problem type selected.");
-           }
-
-          // --- Calculate Area ---
-          // Use formula Area = 0.5 * a * b * sin(C) - ensure C is valid
-          if (!isNaN(a) && !isNaN(b) && !isNaN(C) && C > 0 && C < 180) {
-              area = 0.5 * a * b * sin(toRad(C));
-          } else {
-              area = NaN; // Cannot calculate area
+        if (problemType === 'SSS') {
+          a = parseFloat(document.getElementById('triangle-side-a').value);
+          b = parseFloat(document.getElementById('triangle-side-b').value);
+          c = parseFloat(document.getElementById('triangle-side-c').value);
+          if (isNaN(a) || isNaN(b) || isNaN(c) || a <= TOLERANCE || b <= TOLERANCE || c <= TOLERANCE) throw new Error("Valid positive side lengths required.");
+          if (a + b <= c + TOLERANCE || a + c <= b + TOLERANCE || b + c <= a + TOLERANCE) throw new Error("Triangle inequality violated (sides cannot form a triangle).");
+          let cosA = (b * b + c * c - a * a) / (2 * b * c);
+          let cosB = (a * a + c * c - b * b) / (2 * a * c);
+          cosA = Math.max(-1, Math.min(1, cosA));
+          cosB = Math.max(-1, Math.min(1, cosB));
+          A = toDeg(acos(cosA));
+          B = toDeg(acos(cosB));
+          C = 180 - A - B;
+          if (isNaN(A) || isNaN(B) || isNaN(C) || A < TOLERANCE || B < TOLERANCE || C < TOLERANCE || Math.abs(A+B+C - 180) > TOLERANCE * 10) {
+            throw new Error("Could not calculate valid angles (check inputs).");
           }
-
-
-         // --- Display Results ---
-         resultDiv.innerHTML = `
-           <strong>Calculated Values:</strong><br>
-           Side a: ${a.toFixed(2)} units<br>
-           Side b: ${b.toFixed(2)} units<br>
-           Side c: ${c.toFixed(2)} units<br>
-           Angle A: ${A.toFixed(2)}°<br>
-           Angle B: ${B.toFixed(2)}°<br>
-           Angle C: ${C.toFixed(2)}°<br>
-           Area: ${isNaN(area) ? 'N/A' : area.toFixed(2) + ' sq. units'}<br>
-           <small>(Sum of angles: ${(A + B + C).toFixed(2)}°)</small>
-         `;
-
-         // --- Update 3D Visual ---
-         updateTriangleGeometry(a, b, c, A, B, C);
-
+        } else if (problemType === 'SAS') {
+          a = parseFloat(document.getElementById('triangle-side-a').value);
+          C = parseFloat(document.getElementById('triangle-angle-c').value);
+          b = parseFloat(document.getElementById('triangle-side-b').value);
+          if (isNaN(a) || isNaN(b) || isNaN(C) || a <= TOLERANCE || b <= TOLERANCE || C <= TOLERANCE || C >= 180 - TOLERANCE) throw new Error("Valid positive sides and angle (0 < C < 180) required.");
+          const Crad = toRad(C);
+          c = sqrt(a * a + b * b - 2 * a * b * cos(Crad));
+          if (isNaN(c) || c <= TOLERANCE) throw new Error("Could not calculate valid side c.");
+          let cosA = (b * b + c * c - a * a) / (2 * b * c);
+          cosA = Math.max(-1, Math.min(1, cosA));
+          A = toDeg(acos(cosA));
+          B = 180 - A - C;
+          if (isNaN(A) || isNaN(B) || A < TOLERANCE || B < TOLERANCE || Math.abs(A+B+C - 180) > TOLERANCE * 10) throw new Error("Could not calculate valid remaining angles.");
+        } else if (problemType === 'ASA') {
+          A = parseFloat(document.getElementById('triangle-angle-a').value);
+          c = parseFloat(document.getElementById('triangle-side-c').value);
+          B = parseFloat(document.getElementById('triangle-angle-b').value);
+          if (isNaN(A) || isNaN(B) || isNaN(c) || A <= TOLERANCE || B <= TOLERANCE || c <= TOLERANCE || A + B >= 180 - TOLERANCE) throw new Error("Valid positive angles and side required (A+B < 180).");
+          C = 180 - A - B;
+          if (C <= TOLERANCE) throw new Error("Resulting angle C is too small or zero.");
+          const Arad = toRad(A);
+          const Brad = toRad(B);
+          const Crad = toRad(C);
+          a = c * sin(Arad) / sin(Crad);
+          b = c * sin(Brad) / sin(Crad);
+          if (isNaN(a) || isNaN(b) || a < TOLERANCE || b < TOLERANCE) throw new Error("Could not calculate valid remaining sides.");
+        } else if (problemType === 'AAS') {
+          A = parseFloat(document.getElementById('triangle-angle-a').value);
+          B = parseFloat(document.getElementById('triangle-angle-b').value);
+          a = parseFloat(document.getElementById('triangle-side-a').value);
+          if (isNaN(A) || isNaN(B) || isNaN(a) || A <= TOLERANCE || B <= TOLERANCE || a <= TOLERANCE || A + B >= 180 - TOLERANCE) throw new Error("Valid positive angles and side required (A+B < 180).");
+          C = 180 - A - B;
+          if (C <= TOLERANCE) throw new Error("Resulting angle C is too small or zero.");
+          const Arad = toRad(A);
+          const Brad = toRad(B);
+          const Crad = toRad(C);
+          b = a * sin(Brad) / sin(Arad);
+          c = a * sin(Crad) / sin(Arad);
+          if (isNaN(b) || isNaN(c) || b < TOLERANCE || c < TOLERANCE) throw new Error("Could not calculate valid remaining sides.");
+        } else {
+          throw new Error("Unknown problem type selected.");
+        }
+        if (!isNaN(a) && !isNaN(b) && !isNaN(C) && C > TOLERANCE && C < 180 - TOLERANCE) {
+          area = 0.5 * a * b * sin(toRad(C));
+          if (isNaN(area) || area < TOLERANCE) area = NaN;
+        } else {
+          area = NaN;
+        }
+        resultDiv.innerHTML = `
+          <strong>Calculated Values:</strong><br>
+          Side a: ${a.toFixed(2)} units<br>
+          Side b: ${b.toFixed(2)} units<br>
+          Side c: ${c.toFixed(2)} units<br>
+          Angle A: ${A.toFixed(2)}°<br>
+          Angle B: ${B.toFixed(2)}°<br>
+          Angle C: ${C.toFixed(2)}°<br>
+          Area: ${isNaN(area) ? 'N/A' : area.toFixed(2) + ' sq. units'}<br>
+          <small>(Sum of angles: ${(A + B + C).toFixed(2)}°)</small>
+        `;
+        updateTriangleGeometry(a, b, c, A, B, C);
       } catch (error) {
         resultDiv.innerHTML = `<p style="color: #ff6666;">Error: ${error.message || 'Invalid input or calculation failed.'}</p>`;
-        // Optionally clear the 3D triangle or show an error state?
-         const regionIndex = parseInt(document.getElementById('triangle-select').value) - 1;
-         const triangleMesh = triangleRegions[regionIndex];
-         if (triangleMesh) {
-             // Maybe reset geometry to default or hide markers?
-             // Resetting is complex, hiding markers might be better
-              while (triangleMesh.children.length > 0) {
-                   triangleMesh.remove(triangleMesh.children[0]);
-               }
-         }
+        resultDiv.classList.add('error');
+        const regionIndex = parseInt(document.getElementById('triangle-select').value) - 1;
+        const triangleMesh = triangleRegions[regionIndex];
+        if (triangleMesh) {
+          while (triangleMesh.children.length > 0) {
+            const child = triangleMesh.children[0];
+            if (child.material) {
+              if(child.material.map) child.material.map.dispose();
+              child.material.dispose();
+            }
+            if(child.geometry) child.geometry.dispose();
+            triangleMesh.remove(child);
+          }
+        }
       }
     }
 
-    // Update the 3D geometry of the selected triangle based on calculated values
+    // --- Correction: Updated Triangle Geometry Function ---
     function updateTriangleGeometry(a, b, c, A_deg, B_deg, C_deg) {
       const regionIndex = parseInt(document.getElementById('triangle-select').value) - 1;
       const triangleMesh = triangleRegions[regionIndex];
-       if (!triangleMesh || isNaN(a) || isNaN(b) || isNaN(c) || isNaN(A_deg) || isNaN(B_deg) || isNaN(C_deg)) {
-           console.warn("Cannot update triangle geometry, invalid values:", a,b,c,A_deg,B_deg,C_deg);
-           return;
-       }
-
-       const A_rad = toRad(A_deg);
-       const B_rad = toRad(B_deg);
-       // const C_rad = toRad(C_deg); // Not directly needed for vertex placement if using A and B
-
-       // Place vertex C at origin (relative to mesh's group position)
-       const vC = new THREE.Vector3(0, 0, 0);
-       // Place vertex A along the positive x-axis at distance b from C
-       const vA = new THREE.Vector3(b, 0, 0);
-       // Place vertex B using side a and angle C (relative to C)
-       // Angle C is angle(ACB)
-       const vB = new THREE.Vector3(a * Math.cos(A_rad), 0, a * Math.sin(A_rad));
-       // Correction: Angle C involves sides a and b. Let's recalculate B based on A and C.
-       // Place C at Origin(0,0,0)
-       // Place B on x-axis at distance 'a'. B = (a, 0, 0)
-       // Place A using side 'b' and angle C. A = (b*cos(C), b*sin(C), 0)
-       // Let's try:
-       // Place A at Origin (0,0,0)
-       // Place B at (c, 0, 0)
-       // Place C at (b*cos(A_rad), b*sin(A_rad), 0)
-
-        const vA_final = new THREE.Vector3(0, 0, 0);
-        const vB_final = new THREE.Vector3(c, 0, 0);
-        const vC_final = new THREE.Vector3(b * Math.cos(A_rad), 0, b * Math.sin(A_rad)); // Use Z for ground plane
-
-       const positions = triangleMesh.geometry.attributes.position;
-       positions.setXYZ(0, vA_final.x, vA_final.y, vA_final.z); // Vertex A
-       positions.setXYZ(1, vB_final.x, vB_final.y, vB_final.z); // Vertex B
-       positions.setXYZ(2, vC_final.x, vC_final.y, vC_final.z); // Vertex C
-
-       positions.needsUpdate = true;
-       triangleMesh.geometry.computeVertexNormals();
-       triangleMesh.geometry.computeBoundingSphere(); // Update bounds
-
-       // Update markers with the FULL set of calculated values
-       const updatedData = { sides: [a, b, c], angles: [A_deg, B_deg, C_deg] };
-       addTriangleMarkers(triangleMesh, updatedData);
+      if (!triangleMesh || isNaN(a) || isNaN(b) || isNaN(c) || isNaN(A_deg) || isNaN(B_deg) || isNaN(C_deg)) {
+        console.warn("Cannot update triangle geometry, invalid values:", a,b,c,A_deg,B_deg,C_deg);
+        return;
+      }
+      // Define toRad locally
+      const toRad = angle => angle * Math.PI / 180;
+      const A_rad = toRad(A_deg);
+      // Define vertices:
+      const vA = new THREE.Vector3(0, 0, 0); // Vertex A at origin
+      const vC = new THREE.Vector3(b, 0, 0); // Vertex C along x-axis at distance b
+      // Vertex B calculated using side c and angle A at A
+      const vB = new THREE.Vector3(c * Math.cos(A_rad), 0, c * Math.sin(A_rad));
+      const positions = triangleMesh.geometry.attributes.position;
+      positions.setXYZ(0, vA.x, vA.y, vA.z);
+      positions.setXYZ(1, vB.x, vB.y, vB.z);
+      positions.setXYZ(2, vC.x, vC.y, vC.z);
+      positions.needsUpdate = true;
+      triangleMesh.geometry.computeVertexNormals();
+      triangleMesh.geometry.computeBoundingSphere();
+      const updatedData = { sides: [a, b, c], angles: [A_deg, B_deg, C_deg] };
+      addTriangleMarkers(triangleMesh, updatedData);
     }
 
-
-    // --- Vector Module Functions ---
     function updateVectors() {
       const v1x = parseFloat(document.getElementById('vector1-x').value) || 0;
       const v1y = parseFloat(document.getElementById('vector1-y').value) || 0;
@@ -2059,140 +1836,132 @@
       const v2x = parseFloat(document.getElementById('vector2-x').value) || 0;
       const v2y = parseFloat(document.getElementById('vector2-y').value) || 0;
       const v2z = parseFloat(document.getElementById('vector2-z').value) || 0;
-
-      createVector('vector1', v1x, v1y, v1z, 0xff0000); // Red
-      createVector('vector2', v2x, v2y, v2z, 0x00ff00); // Green
-
-      // Clear previous result vector and dot product info
-       if (vectorArrows.resultVector) {
-           vectorGroup.remove(vectorArrows.resultVector);
-           vectorArrows.resultVector = null;
-            const oldLabel = vectorGroup.children.find(child => child.userData.isLabel && child.userData.arrowName === 'resultVector');
-            if (oldLabel) vectorGroup.remove(oldLabel);
-       }
-       const resultDiv = document.getElementById('vector-result');
-       // Keep basic info, remove dot product specific info until calculated
-       const mag1 = Math.sqrt(v1x * v1x + v1y * v1y + v1z * v1z);
-       const mag2 = Math.sqrt(v2x * v2x + v2y * v2y + v2z * v2z);
-       resultDiv.innerHTML = `
-         <strong>Vector 1 (Red):</strong> (${v1x.toFixed(1)}, ${v1y.toFixed(1)}, ${v1z.toFixed(1)}) | Mag: ${mag1.toFixed(2)}<br>
-         <strong>Vector 2 (Green):</strong> (${v2x.toFixed(1)}, ${v2y.toFixed(1)}, ${v2z.toFixed(1)}) | Mag: ${mag2.toFixed(2)}<br>
-         <em>Click 'Calculate Dot Product' for angle analysis.</em>
-       `;
+      createVector('vector1', v1x, v1y, v1z, 0xff0000);
+      createVector('vector2', v2x, v2y, v2z, 0x00ff00);
+      if (vectorArrows.resultVector) {
+        const label = vectorGroup.children.find(child => child.userData.isLabel && child.userData.arrowName === 'resultVector');
+        if (label) {
+          if (label.material.map) label.material.map.dispose();
+          label.material.dispose();
+          vectorGroup.remove(label);
+        }
+        vectorGroup.remove(vectorArrows.resultVector);
+        vectorArrows.resultVector = null;
+      }
+      const resultDiv = document.getElementById('vector-result');
+      const mag1 = Math.sqrt(v1x * v1x + v1y * v1y + v1z * v1z);
+      const mag2 = Math.sqrt(v2x * v2x + v2y * v2y + v2z * v2z);
+      resultDiv.innerHTML = `
+        <strong>Vector 1 (Red):</strong> (${v1x.toFixed(1)}, ${v1y.toFixed(1)}, ${v1z.toFixed(1)}) | Mag: ${mag1.toFixed(2)}<br>
+        <strong>Vector 2 (Green):</strong> (${v2x.toFixed(1)}, ${v2y.toFixed(1)}, ${v2z.toFixed(1)}) | Mag: ${mag2.toFixed(2)}<br>
+        <em id="dot-product-prompt">Click 'Calculate Dot Product' for angle analysis.</em>
+        <div id="dot-product-results" style="margin-top: 5px;"></div>
+      `;
+      const existingCompletion = resultDiv.querySelector('.completion-message');
+      if (existingCompletion) existingCompletion.remove();
     }
 
     function calculateDotProduct() {
-      // Ensure vectors are up-to-date first
       updateVectors();
-
-      // Get current vector data (might have been clamped/updated by createVector)
       const v1Data = vectorArrows.vector1?.userData?.vectorData;
       const v2Data = vectorArrows.vector2?.userData?.vectorData;
-
+      const resultsContainer = document.getElementById('dot-product-results');
+      const prompt = document.getElementById('dot-product-prompt');
+      if(prompt) prompt.style.display = 'none';
+      if(!resultsContainer) return;
       if (!v1Data || !v2Data) {
-          document.getElementById('vector-result').innerHTML += '<p style="color: #ff6666;">Cannot calculate dot product: One or both vectors are zero length.</p>';
-          return;
+        resultsContainer.innerHTML = '<p style="color: #ff6666;">Cannot calculate dot product: One or both vectors are zero length.</p>';
+        return;
       }
-
-       const { x: v1x, y: v1y, z: v1z } = v1Data;
-       const { x: v2x, y: v2y, z: v2z } = v2Data;
-
+      const { x: v1x, y: v1y, z: v1z } = v1Data;
+      const { x: v2x, y: v2y, z: v2z } = v2Data;
       const dotProduct = v1x * v2x + v1y * v2y + v1z * v2z;
       const mag1 = Math.sqrt(v1x * v1x + v1y * v1y + v1z * v1z);
       const mag2 = Math.sqrt(v2x * v2x + v2y * v2y + v2z * v2z);
       let angleDegrees = NaN;
       let relationship = "N/A";
-
-      // Check for non-zero magnitudes before calculating angle
-      if (mag1 > 1e-9 && mag2 > 1e-9) {
+      const TOLERANCE = 1e-6;
+      if (mag1 > TOLERANCE && mag2 > TOLERANCE) {
         let cosAngle = dotProduct / (mag1 * mag2);
-        cosAngle = Math.max(-1, Math.min(1, cosAngle)); // Clamp for safety
+        cosAngle = Math.max(-1, Math.min(1, cosAngle));
         angleDegrees = Math.acos(cosAngle) * 180 / Math.PI;
-
-        if (Math.abs(dotProduct) < 1e-6) { // Check for perpendicularity (tolerance)
-            relationship = 'Orthogonal (Perpendicular)';
-            angleDegrees = 90; // Set exactly to 90 if dot product is near zero
-        } else if (Math.abs(dotProduct - mag1 * mag2) < 1e-6) { // Parallel check
-            relationship = 'Parallel (Same Direction)';
-            angleDegrees = 0;
-        } else if (Math.abs(dotProduct + mag1 * mag2) < 1e-6) { // Anti-parallel check
-            relationship = 'Anti-parallel (Opposite Directions)';
-            angleDegrees = 180;
+        if (Math.abs(dotProduct) < TOLERANCE) {
+          relationship = 'Orthogonal (Perpendicular)';
+          angleDegrees = 90;
+        } else if (Math.abs(1 - cosAngle) < TOLERANCE) {
+          relationship = 'Parallel (Same Direction)';
+          angleDegrees = 0;
+        } else if (Math.abs(-1 - cosAngle) < TOLERANCE) {
+          relationship = 'Anti-parallel (Opposite Directions)';
+          angleDegrees = 180;
         } else if (dotProduct > 0) {
-            relationship = 'Acute Angle';
+          relationship = 'Acute Angle';
         } else {
-            relationship = 'Obtuse Angle';
+          relationship = 'Obtuse Angle';
         }
       } else {
-          relationship = 'One or both vectors have zero length.';
+        relationship = 'One or both vectors have zero length.';
       }
-
-
-      const resultDiv = document.getElementById('vector-result');
-       // Update the existing content, replacing the prompt
-       resultDiv.innerHTML = `
-         <strong>Vector 1 (Red):</strong> (${v1x.toFixed(1)}, ${v1y.toFixed(1)}, ${v1z.toFixed(1)}) | Mag: ${mag1.toFixed(2)}<br>
-         <strong>Vector 2 (Green):</strong> (${v2x.toFixed(1)}, ${v2y.toFixed(1)}, ${v2z.toFixed(1)}) | Mag: ${mag2.toFixed(2)}<br>
-         <hr style="margin: 5px 0; border-color: #4fd1c5;">
-         <strong>Dot Product (v1 · v2):</strong> ${dotProduct.toFixed(2)}<br>
-         <strong>Angle between vectors (θ):</strong> ${isNaN(angleDegrees) ? 'N/A' : angleDegrees.toFixed(1) + '°'}<br>
-         <strong>Relationship:</strong> ${relationship}
-       `;
-
-      // Simple visualization attempt: Add resultant vector (sum)
-       const sumX = v1x + v2x;
-       const sumY = v1y + v2y;
-       const sumZ = v1z + v2z;
-       createVector('resultVector', sumX, sumY, sumZ, 0xffff00); // Yellow resultant
+      resultsContainer.innerHTML = `
+        <hr style="margin: 5px 0; border-color: #4fd1c5;">
+        <strong>Dot Product (v1 · v2):</strong> ${dotProduct.toFixed(2)}<br>
+        <strong>Angle between vectors (θ):</strong> ${isNaN(angleDegrees) ? 'N/A' : angleDegrees.toFixed(1) + '°'}<br>
+        <strong>Relationship:</strong> ${relationship}
+      `;
+      const sumX = v1x + v2x;
+      const sumY = v1y + v2y;
+      const sumZ = v1z + v2z;
+      createVector('resultVector', sumX, sumY, sumZ, 0xffff00);
     }
 
-
-    // --- Polar Module Functions ---
     function updatePolarParams() {
       const a = parseFloat(document.getElementById('polar-a').value);
       const n = parseFloat(document.getElementById('polar-n').value);
       document.getElementById('polar-a-value').textContent = a.toFixed(1);
-      document.getElementById('polar-n-value').textContent = n.toFixed(0); // n is usually integer
+      document.getElementById('polar-n-value').textContent = n.toFixed(0);
       const type = document.getElementById('polar-type').value;
       const equationDiv = document.getElementById('polar-equation');
-
-       // Update displayed equation based on type
-       let eqStr = "r = ";
-       const aStr = a.toFixed(1);
-       const nStr = n.toFixed(0);
-       switch (type) {
-           case 'rose': eqStr += `${aStr} · cos(${nStr}θ)`; break;
-           case 'limaçon': eqStr += `1 + ${aStr} · cos(θ)`; break; // Using r = 1 + a*cos(theta) form
-           case 'lemniscate': eqStr += `√(${aStr}² · cos(2θ))`; break;
-           case 'cardioid': eqStr += `${aStr} · (1 + cos(θ))`; break;
-           case 'spiral': eqStr += `${aStr} · θ / (2π)`; break;
-           default: eqStr = "Select type";
-       }
-       equationDiv.innerHTML = eqStr;
-       // Curve updates handled by event listener calling updatePolarCurve()
+      let eqStr = "r = ";
+      const aStr = a.toFixed(1);
+      const nStr = n.toFixed(0);
+      switch (type) {
+        case 'rose': eqStr += `${aStr} · cos(${nStr}θ)`; break;
+        case 'limaçon': eqStr += `1 + ${aStr} · cos(θ)`; break;
+        case 'lemniscate': eqStr += `√(${aStr}² · cos(2θ))`; break;
+        case 'cardioid': eqStr += `${aStr} · (1 + cos(θ))`; break;
+        case 'spiral': eqStr += `${aStr} · θ / (2π)`; break;
+        default: eqStr = "Select type";
+      }
+      equationDiv.innerHTML = eqStr;
+      const resultDiv = document.getElementById('polar-result');
+      const rectResult = resultDiv.querySelector('#polar-rect-result');
+      if(rectResult) rectResult.innerHTML = '';
+      const existingCompletion = resultDiv.querySelector('.completion-message');
+      if (existingCompletion) existingCompletion.remove();
     }
 
     function updatePolarCurve() {
       const type = document.getElementById('polar-type').value;
       const a = parseFloat(document.getElementById('polar-a').value);
       const n = parseFloat(document.getElementById('polar-n').value);
-      createPolarCurve(type, a, n); // This now handles drawing/redrawing
-
+      createPolarCurve(type, a, n);
       const resultDiv = document.getElementById('polar-result');
       let description = '';
       switch (type) {
         case 'rose':
-          const petals = (n % 2 === 0 && n !== 0) ? (2 * n) : (n === 0 ? 1 : n); // Handle n=0 as circle
+          const petals = (n > 0 && n % 2 === 0) ? (2 * n) : (n > 0 ? n : 1);
           description = `Rose curve with ${petals} petal${petals !== 1 ? 's' : ''}.`;
+          if (n===0) description = `Circle (r=${a.toFixed(1)}).`;
           break;
-        case 'limaçon': // Describe based on 'a' relative to the '1' in r = 1 + a*cos(theta)
-             if (a === 1) description = `Cardioid (special Limaçon).`; // Should match cardioid selection
-             else if (a > 1) description = `Dimpled Limaçon.`;
-             else if (a < 1 && a > 0) description = `Limaçon with inner loop.`;
-             else description = `Limaçon.`; // Default/other cases
-             break;
+        case 'limaçon':
+          if (Math.abs(a - 1) < 1e-6) description = `Cardioid (special Limaçon).`;
+          else if (a > 1) description = `Dimpled Limaçon.`;
+          else if (a < 1 && a > 0) description = `Limaçon with inner loop.`;
+          else if (a === 0) description = `Circle (r=1).`;
+          else description = `Limaçon.`;
+          break;
         case 'lemniscate': description = `Lemniscate (figure-eight).`; break;
-        case 'cardioid': description = `Cardioid (heart shape, r = a(1+cosθ)).`; break;
+        case 'cardioid': description = `Cardioid (heart shape).`; break;
         case 'spiral': description = `Archimedean Spiral.`; break;
         default: description = "Selected feature.";
       }
@@ -2200,67 +1969,51 @@
         <p><strong>Feature:</strong> ${description}</p>
         <p><strong>Current Equation:</strong> ${document.getElementById('polar-equation').innerHTML}</p>
         <p><strong>Parameters:</strong> a = ${a.toFixed(1)}, n = ${n.toFixed(0)}</p>
-        <p id="polar-rect-result" style="font-size: 0.9em;"></p> <!-- Placeholder for conversion result -->
+        <p id="polar-rect-result" style="font-size: 0.9em; margin-top: 5px;"></p>
       `;
-      // Clear previous conversion result
-      document.getElementById('polar-rect-result').innerHTML = '';
     }
 
     function convertPolar() {
-        const type = document.getElementById('polar-type').value;
-        const a = parseFloat(document.getElementById('polar-a').value);
-        const n = parseFloat(document.getElementById('polar-n').value);
-        const resultP = document.getElementById('polar-rect-result');
-        if (!resultP) return;
-
-        let rectangularForm = 'Conversion is complex or not easily represented algebraically.';
-        const aStr = a.toFixed(1);
-        const aSqStr = (a*a).toFixed(1);
-
-        try {
-             // Basic conversions: x = r cos(θ), y = r sin(θ), r² = x² + y²
-             // tan(θ) = y/x, cos(θ) = x/r, sin(θ) = y/r
-             switch (type) {
-                 case 'cardioid': // r = a(1+cosT) => r = a + a cosT => r = a + a(x/r) => r² = ar + ax
-                      // => x² + y² = a * sqrt(x² + y²) + ax
-                      rectangularForm = `(x² + y² - ${aStr}x)² = ${aSqStr}(x² + y²)`;
-                      break;
-                 case 'lemniscate': // r² = a² cos(2T) => r² = a² (cos²T - sin²T)
-                      // => r² = a² ( (x²/r²) - (y²/r²) ) => r⁴ = a² (x² - y²)
-                      rectangularForm = `(x² + y²)² = ${aSqStr}(x² - y²)`;
-                      break;
-                 case 'limaçon': // r = 1 + a cos(θ) => r = 1 + a(x/r) => r² = r + ax
-                     // => x² + y² = sqrt(x² + y²) + ax
-                     rectangularForm = `(x² + y² - ${aStr}x)² = (x² + y²)`; // Is this right? Let's test. (1+acosT)^2 = (1+ax/r)^2... nope complex.
-                     rectangularForm = `(x² + y² - ${aStr}x)² = x² + y²` // Simpler form from wolframalpha for r=1+a*cos(theta)
-                     break;
-                 case 'rose': // r = a cos(nθ) - Very complex unless n=1 (circle) or n=2 (four-petal)
-                      if (n === 1) rectangularForm = `(x - ${a/2})² + y² = (${a/2})²`; // Circle: r=acosT -> r^2=arcosT -> x^2+y^2 = ax
-                      else if (n === 2) rectangularForm = `(x² + y²)³ = ${aSqStr}(x² - y²)²`; // r=acos(2T)->r=a(c^2-s^2)->r^3=a(x^2-y^2)
-                      else rectangularForm = `Complex for n=${n}`;
-                      break;
-                 case 'spiral': // r = k*theta => sqrt(x²+y²) = k * atan(y/x)
-                     rectangularForm = `√(x²+y²) = (${aStr}/(2π)) · atan(y/x)`;
-                     break;
-                 // case 'circle': // Simple case: r = a (constant)
-                 //      rectangularForm = `x² + y² = ${aSqStr}`;
-                 //      break;
-             }
-         } catch(e) {
-              rectangularForm = 'Error during conversion attempt.';
-              console.error("Polar conversion error:", e);
-          }
-
-        resultP.innerHTML = `<strong>Approx. Rectangular Form:</strong> ${rectangularForm}`;
+      const type = document.getElementById('polar-type').value;
+      const a = parseFloat(document.getElementById('polar-a').value);
+      const n = parseFloat(document.getElementById('polar-n').value);
+      const resultP = document.getElementById('polar-rect-result');
+      if (!resultP) return;
+      let rectangularForm = 'Conversion is complex or not easily represented algebraically.';
+      const aStr = a.toFixed(1);
+      const aSqStr = (a*a).toFixed(1);
+      const xSqPySq = '(x² + y²)';
+      try {
+        switch (type) {
+          case 'cardioid':
+            rectangularForm = `(${xSqPySq} - ${aStr}x)² = ${aSqStr}${xSqPySq}`;
+            break;
+          case 'lemniscate':
+            rectangularForm = `${xSqPySq}² = ${aSqStr}(x² - y²)`;
+            break;
+          case 'limaçon':
+            rectangularForm = `(${xSqPySq} - ${aStr}x)² = ${xSqPySq}`;
+            break;
+          case 'rose':
+            if (n === 1) rectangularForm = `(x - ${a/2})² + y² = (${(a/2).toFixed(1)})²`;
+            else if (n === 2) rectangularForm = `${xSqPySq}³ = ${aSqStr}(x² - y²)²`;
+            else if (n === 0) rectangularForm = `x² + y² = ${aSqStr}`;
+            else rectangularForm = `Complex for n=${n}`;
+            break;
+          case 'spiral':
+            rectangularForm = `√(x²+y²) = (${aStr}/(2π)) · atan2(y, x)`;
+            break;
+        }
+      } catch(e) {
+        rectangularForm = 'Error during conversion attempt.';
+        console.error("Polar conversion error:", e);
+      }
+      resultP.innerHTML = `<strong>Approx. Rectangular Form:</strong> ${rectangularForm}`;
     }
 
-
-    // --- Parametric Module Functions ---
     function updateParametricSpeed() {
       const speed = parseFloat(document.getElementById('param-speed').value);
       document.getElementById('param-speed-value').textContent = speed.toFixed(1);
-      // Optional: Update animation speed immediately if needed
-      // (Currently speed is read inside animate loop)
     }
 
     function updateParametricParams() {
@@ -2270,41 +2023,37 @@
       document.getElementById('param-b-value').textContent = b.toFixed(1);
       const type = document.getElementById('parametric-type').value;
       const equationDiv = document.getElementById('parametric-equation');
-
-       // Update displayed equations (x(t), z(t))
-       let xEq = "x(t) = ";
-       let zEq = "z(t) = ";
-       const aStr = a.toFixed(1);
-       const bStr = b.toFixed(1);
-
-       switch (type) {
-           case 'circle': xEq += `${aStr} · cos(t)`; zEq += `${aStr} · sin(t)`; break;
-           case 'cycloid': xEq += `${aStr} · (t - sin(t))`; zEq += `${aStr} · (1 - cos(t))`; break;
-           case 'lissajous': xEq += `${aStr} · sin(2t)`; zEq += `${bStr} · sin(3t)`; break; // Fixed freq example
-           case 'butterfly':
-               xEq += `${aStr} · sin(t) · [e<sup>cos(t)</sup> - 2cos(4t) - sin<sup>5</sup>(t/12)]`;
-               zEq += `${aStr} · cos(t) · [e<sup>cos(t)</sup> - 2cos(4t) - sin<sup>5</sup>(t/12)]`;
-               break;
-           default: xEq += "..."; zEq += "...";
-       }
-       equationDiv.innerHTML = `${xEq}<br>${zEq}`;
-       // Path updates handled by event listener calling updateParametricPathVisuals()
+      let xEq = "x(t) = ";
+      let zEq = "z(t) = ";
+      const aStr = a.toFixed(1);
+      const bStr = b.toFixed(1);
+      switch (type) {
+        case 'circle': xEq += `${aStr}·cos(t)`; zEq += `${aStr}·sin(t)`; break;
+        case 'cycloid': xEq += `${aStr}·(t - sin(t))`; zEq += `${aStr}·(1 - cos(t))`; break;
+        case 'lissajous': xEq += `${aStr}·sin(2t)`; zEq += `${bStr}·sin(3t)`; break;
+        case 'butterfly':
+          xEq += `${aStr}·sin(t)·[e<sup>cos(t)</sup> - 2cos(4t) - sin<sup>5</sup>(t/12)]`;
+          zEq += `${aStr}·cos(t)·[e<sup>cos(t)</sup> - 2cos(4t) - sin<sup>5</sup>(t/12)]`;
+          break;
+        default: xEq += "..."; zEq += "...";
+      }
+      equationDiv.innerHTML = `${xEq}<br>${zEq}`;
+      const resultDiv = document.getElementById('parametric-result');
+      const existingCompletion = resultDiv.querySelector('.completion-message');
+      if (existingCompletion) existingCompletion.remove();
     }
 
-    // Renamed original update-parametric button function
     function updateParametricPathVisuals() {
       const type = document.getElementById('parametric-type').value;
       const a = parseFloat(document.getElementById('param-a').value);
       const b = parseFloat(document.getElementById('param-b').value);
-      updateParametricPath(type, a, b); // This now redraws path and object
-
-      // Update result description
+      updateParametricPath(type, a, b);
       const resultDiv = document.getElementById('parametric-result');
       let description = '';
       switch (type) {
         case 'circle': description = `Circular path (Radius ≈ ${a.toFixed(1)})`; break;
         case 'cycloid': description = `Cycloid path (Rolling circle radius ≈ ${a.toFixed(1)})`; break;
-        case 'lissajous': description = `Lissajous curve (Amplitudes ≈ ${a.toFixed(1)}, ${b.toFixed(1)})`; break;
+        case 'lissajous': description = `Lissajous curve (Amplitudes ≈ ${a.toFixed(1)}, ${b.toFixed(1)}, Freqs 2:3)`; break;
         case 'butterfly': description = `Butterfly curve (Scale ≈ ${a.toFixed(1)})`; break;
         default: description = "Selected path.";
       }
@@ -2313,6 +2062,8 @@
         <p><strong>Current Equations:</strong><br>${document.getElementById('parametric-equation').innerHTML}</p>
         <p><strong>Parameters:</strong> a = ${a.toFixed(1)}, b = ${b.toFixed(1)}</p>
       `;
+      const existingCompletion = resultDiv.querySelector('.completion-message');
+      if (existingCompletion) existingCompletion.remove();
     }
 
     function toggleAnimation() {
@@ -2320,32 +2071,27 @@
       document.getElementById('toggle-animation').textContent = appState.animationRunning ? 'Pause Animation' : 'Resume Animation';
     }
 
-    // --- Task Completion & Progress ---
     function completeTask(task) {
       if (!appState.completedTasks[task]) {
         appState.completedTasks[task] = true;
         updateProgress();
         const resultDiv = document.getElementById(`${task}-result`);
-         if (resultDiv) {
-             // Remove previous completion message if exists
-             const existingMsg = resultDiv.querySelector('.completion-message');
-             if (existingMsg) existingMsg.remove();
-             // Add new message
-              const completionMsg = `<p class="completion-message" style="color: #48bb78; font-weight: bold; margin-top: 10px;">✓ Task marked as complete!</p>`;
-              resultDiv.insertAdjacentHTML('beforeend', completionMsg); // Append message
-          }
-
+        if (resultDiv) {
+          const existingMsg = resultDiv.querySelector('.completion-message');
+          if (existingMsg) existingMsg.remove();
+          const completionMsgHTML = `<p class="completion-message">✓ Task marked as complete!</p>`;
+          resultDiv.insertAdjacentHTML('beforeend', completionMsgHTML);
+        }
         const button = document.getElementById(`complete-${task}`);
-         if (button) {
-             button.disabled = true;
-             button.textContent = '✓ Completed';
-             button.style.backgroundColor = '#555';
-             button.style.cursor = 'default';
-          }
-
+        if (button) {
+          button.disabled = true;
+          button.textContent = '✓ Completed';
+          button.style.backgroundColor = '#555';
+          button.style.cursor = 'default';
+        }
         const allCompleted = Object.values(appState.completedTasks).every(status => status);
         if (allCompleted) {
-          setTimeout(showCompletion, 500); // Show completion modal after a short delay
+          setTimeout(showCompletion, 500);
         }
       }
     }
@@ -2353,35 +2099,27 @@
     function updateProgress() {
       const completedCount = Object.values(appState.completedTasks).filter(status => status).length;
       const totalTasks = Object.keys(appState.completedTasks).length;
-
-      // Update overview progress text
       const progressText = document.querySelector('#progress-display p');
-       if(progressText) {
-           progressText.textContent = `Tasks completed: ${completedCount}/${totalTasks}`;
-       }
-
-      // Update overview progress bar
+      if(progressText) {
+        progressText.textContent = `Tasks completed: ${completedCount}/${totalTasks}`;
+      }
       const overviewProgressBarContainer = document.querySelector('#progress-display');
       if (overviewProgressBarContainer) {
-          let progressBarDiv = overviewProgressBarContainer.querySelector('.progress-bar-visual');
-          if (!progressBarDiv) {
-               const barContainer = document.createElement('div');
-               barContainer.style.cssText = `background-color: rgba(79, 209, 197, 0.2); height: 10px; border-radius: 5px; margin-top: 5px; overflow: hidden; border: 1px solid #38b2ac;`;
-               progressBarDiv = document.createElement('div');
-               progressBarDiv.className = 'progress-bar-visual';
-               progressBarDiv.style.cssText = `background-color: #4fd1c5; width: 0%; height: 100%; border-radius: 5px; transition: width 0.4s ease-out;`; // Rounded ends
-               barContainer.appendChild(progressBarDiv);
-               overviewProgressBarContainer.appendChild(barContainer);
-           }
-           const percentage = totalTasks > 0 ? (completedCount / totalTasks) * 100 : 0;
-           progressBarDiv.style.width = `${percentage}%`;
-           // Ensure right radius is visible when complete
-           progressBarDiv.style.borderTopRightRadius = (percentage === 100) ? '5px' : '0px';
-           progressBarDiv.style.borderBottomRightRadius = (percentage === 100) ? '5px' : '0px';
-
+        let progressBarDiv = overviewProgressBarContainer.querySelector('.progress-bar-visual');
+        if (!progressBarDiv) {
+          const barContainer = document.createElement('div');
+          barContainer.style.cssText = `background-color: rgba(79, 209, 197, 0.2); height: 10px; border-radius: 5px; margin-top: 5px; overflow: hidden; border: 1px solid #38b2ac;`;
+          progressBarDiv = document.createElement('div');
+          progressBarDiv.className = 'progress-bar-visual';
+          progressBarDiv.style.cssText = `background-color: #4fd1c5; width: 0%; height: 100%; border-radius: 5px; transition: width 0.4s ease-out;`;
+          barContainer.appendChild(progressBarDiv);
+          overviewProgressBarContainer.appendChild(barContainer);
+        }
+        const percentage = totalTasks > 0 ? (completedCount / totalTasks) * 100 : 0;
+        progressBarDiv.style.width = `${percentage}%`;
+        progressBarDiv.style.borderTopRightRadius = (percentage === 100) ? '5px' : '0px';
+        progressBarDiv.style.borderBottomRightRadius = (percentage === 100) ? '5px' : '0px';
       }
-
-      // Update Mission Log checkboxes
       document.querySelectorAll('.progress-item').forEach((item, index) => {
         const tasks = ['triangulation', 'vectors', 'polar', 'parametric'];
         const taskName = tasks[index];
@@ -2391,40 +2129,32 @@
           checkSpan.innerHTML = '✔️';
           item.classList.add('completed');
           checkSpan.style.color = '#48bb78';
-          taskTextSpan.style.textDecoration = 'line-through';
-          taskTextSpan.style.opacity = '0.7';
         } else {
           checkSpan.innerHTML = '☐';
           item.classList.remove('completed');
           checkSpan.style.color = '#4fd1c5';
-           taskTextSpan.style.textDecoration = 'none';
-           taskTextSpan.style.opacity = '1';
         }
       });
     }
 
     function showCompletion() {
-      // Create modal overlay
-        const overlay = document.createElement('div');
-        overlay.id = 'modal-overlay';
-        overlay.style.cssText = `
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0, 0, 0, 0.6); z-index: 199; display: block;
-        `;
-        document.body.appendChild(overlay);
-
+      if (document.getElementById('completion-modal-instance')) return;
+      const overlay = document.createElement('div');
+      overlay.id = 'modal-overlay';
+      overlay.style.cssText = `
+          position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+          background-color: rgba(0, 0, 0, 0.6); z-index: 199; display: block; backdrop-filter: blur(3px);
+      `;
+      document.body.appendChild(overlay);
       const completionModal = document.createElement('div');
       completionModal.id = 'completion-modal-instance';
-       // Use styles similar to welcome modal
-       completionModal.style.cssText = `
-           position: fixed; /* Use fixed for overlay */
-           top: 50%; left: 50%; transform: translate(-50%, -50%);
-           width: 90%; max-width: 600px; background-color: rgba(10, 10, 40, 0.9); /* Dark blue bg */
-           border-radius: 15px; padding: 25px; z-index: 200;
-           box-shadow: 0 0 25px rgba(79, 209, 197, 0.7); color: white;
-           border: 1px solid #4fd1c5;
-       `;
-
+      completionModal.style.cssText = `
+          position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+          width: 90%; max-width: 600px; background-color: rgba(10, 10, 40, 0.9);
+          border-radius: 15px; padding: 25px; z-index: 200;
+          box-shadow: 0 0 25px rgba(79, 209, 197, 0.7); color: white;
+          border: 1px solid #4fd1c5; opacity: 0;
+      `;
       completionModal.innerHTML = `
         <h1 style="color: #4fd1c5; text-align: center; margin-bottom: 20px; font-size: 1.8em;">✨ Mission Accomplished! ✨</h1>
         <p style="text-align: center; font-size: 1.1em; margin-bottom: 15px;">Congratulations, explorer! You have successfully mapped Trigonomia Island using your mathematical prowess!</p>
@@ -2441,52 +2171,43 @@
         </div>
       `;
       document.body.appendChild(completionModal);
-
-      // Close button handler
       const closeBtn = document.getElementById('close-completion');
-       const closeHandler = () => {
-           gsap.to(completionModal, { duration: 0.3, opacity: 0, scale: 0.9, ease: "power1.in", onComplete: () => {
-               completionModal.remove();
-               overlay.remove();
-           }});
-       };
-      if(closeBtn) closeBtn.addEventListener('click', closeHandler, { once: true });
-      overlay.addEventListener('click', closeHandler, { once: true }); // Close on overlay click too
-
-      // Entrance animation
-      gsap.from(completionModal, { duration: 0.5, opacity: 0, scale: 0.8, ease: "back.out(1.7)" });
-
-    }
-
-
-    // --- Initialization ---
-    function init() {
-      initLoading(); // Show loading screen first
-      initScene();
-      initEventListeners();
-      updateProgress(); // Initial progress display setup
-
-      // Initial setup for the default module (overview)
-      switchModule('overview');
-
-       // Add GSAP library dynamically
-       loadScript('https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js', () => {
-           console.log("GSAP loaded.");
-           // You can now use GSAP animations here or ensure it's loaded before calling functions that use it.
-           // For example, trigger welcome modal animation if needed, or ensure camera animations work.
-       });
-
-      // Pre-populate first triangle inputs on load
-       if(triangleData.length > 0){
-            document.getElementById('triangle-select').value = '1'; // Select first region
-            // updateTriangleInfo(); // Called within updateTriangleProblem
-            updateTriangleProblem(); // Set up inputs & info for the first region's type
+      const closeHandler = () => {
+        if (!gsap) {
+          if (completionModal) completionModal.remove();
+          if (overlay) overlay.remove();
+          return;
         }
+        gsap.to(completionModal, { duration: 0.3, opacity: 0, scale: 0.9, ease: "power1.in", onComplete: () => {
+          if (completionModal) completionModal.remove();
+          if (overlay) overlay.remove();
+        }});
+      };
+      if(closeBtn) closeBtn.addEventListener('click', closeHandler, { once: true });
+      overlay.addEventListener('click', closeHandler, { once: true });
+      if (gsap) {
+        gsap.to(completionModal, { duration: 0.5, opacity: 1, scale: 1, ease: "back.out(1.7)" });
+      } else {
+        completionModal.style.opacity = 1;
+      }
     }
 
-    // Wait for DOM content to be loaded before initializing
-    window.addEventListener('DOMContentLoaded', init);
+    function init() {
+      loadScript('https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js', () => {
+        console.log("GSAP loaded.");
+        initLoading();
+        initScene();
+        initEventListeners();
+        updateProgress();
+        switchModule('overview');
+        if(triangleData.length > 0){
+          document.getElementById('triangle-select').value = '1';
+          updateTriangleProblem();
+        }
+      });
+    }
 
+    window.addEventListener('DOMContentLoaded', init);
   </script>
 </body>
 </html>
